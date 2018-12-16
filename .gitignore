@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 *.html
-public/
-static/
-themes/
+_site
+*.js
+*.png
+*.css

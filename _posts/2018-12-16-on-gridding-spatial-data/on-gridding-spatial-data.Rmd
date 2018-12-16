@@ -1,0 +1,223 @@
+---
+title: "On gridding spatial data"
+description: |
+  Lets say we have some spatial observations and wanted to calculate some summary metric (count, sum, mean, variance, ...) based on specified spacial gridding of the raw data.
+author:
+  - name: einar.hjorleifsson
+date: 2018-02-03
+output:
+  radix::radix_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+### Preamble
+
+Needed libraries:
+
+```{r}
+library(tidyverse)
+library(rmarkdown)
+```
+
+As an example we take 100 observations on a limited spatial scale of some 3 degrees longitude and 1 latitude and will calculate the number of observations that fall within a 0.5 degree longitude and 0.25 degree latitude as depicted in the figure below (blue labels are the counts statistics of the observation within each grid):
+
+```{r, echo = FALSE}
+grade <- function(x, dx) {
+  brks <- seq(floor(min(x)), ceiling(max(x)),dx)
+  ints <- findInterval(x, brks, all.inside = TRUE)
+  x <- (brks[ints] + brks[ints + 1]) / 2
+  return(x)
+}
+encode_zchords <- function(x, y, dx = 1, dy = 0.5 * dx, invalids = TRUE) {
+  
+  x <- grade(x, dx)
+  y <- grade(y, dy)
+  
+  if(invalids) {
+    x <- ifelse(x >= -180 & x <= 180, x, NA)
+    y <- ifelse(y >= -90  & y <= 90 , y, NA)
+  }
+  
+  return(paste(round(x,6), round(y,6), sep = ":"))
+  
+}
+set.seed(314)
+df <- 
+  data_frame(lon =    runif(n = 1e2, min = -28, max = -25),
+             lat =    runif(n = 1e2, min =  64, max =  65),
+             effort = rnorm(n = 1e2, mean = 1000, sd = 200)) %>% 
+  mutate(sq = encode_zchords(lon, lat, dx = 0.5, dy = 0.25),
+         type = "zchords") %>% 
+  separate(sq, c("lon2", "lat2"), sep = ":", convert = TRUE, remove = FALSE)
+d <- 
+  df %>% 
+  mutate(sq = encode_zchords(lon, lat, dx = 0.5, dy = 0.25),
+         type = "zchords") %>% 
+  group_by(sq) %>% 
+  summarise(n = n()) %>%
+  separate(sq, c("lon2", "lat2"), sep = ":", convert = TRUE, remove = FALSE) %>% 
+  mutate(name = letters[1:n()])
+
+p <- 
+  d %>% 
+  ggplot() +
+  theme_bw() +
+  geom_text(aes(lon2, lat2, label = n), size = 10, colour = "blue") +
+  geom_point(data = df, aes(lon, lat)) +
+  coord_quickmap() +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = seq(-28, -25, by = 0.5)) +
+  theme(panel.grid.minor = element_line(colour = NA)) +
+  labs(x = NULL, y = NULL)
+p
+```
+
+In order to solve this problem one needs first to transform each spatial point to a central point based on user's defined xy-resolution. I.e. we want to transform the observed spatial x and y value (the black points) to a single spatial point (the pink points) as depicted visually in this graph:
+
+
+```{r, echo = FALSE}
+p +
+  geom_point(data = df, aes(lon2, lat2), colour = "red", size = 5, alpha = 0.1) +
+  geom_segment(data = df, aes(lon, lat, xend = lon2, yend = lat2))
+```
+
+Now, solving this problem has been done myriads of times. What is documented here an example of a code flow within the tidyverse environment.
+
+### The code logic
+
+The raw data above were generated as follows:
+
+```{r}
+set.seed(314) # for the love of pi
+d <- 
+  data_frame(lon =    runif(n = 1e2, min = -28, max = -25),
+             lat =    runif(n = 1e2, min =  64, max =  65),
+             effort = rnorm(n = 1e2, mean = 1000, sd = 200))
+```
+
+Lets break the problem up by solving just one dimension (e.g. the longitude). The challenge is to assign each point to a bin and count the number of incidences that a point falls within an interval. Sort of like what happens when we generate a histogram:
+
+```{r}
+d %>% 
+  ggplot() +
+  geom_histogram(aes(lon), breaks = seq(-28, -25, by = 0.5), 
+                 fill = "grey", colour = "black") +
+  geom_jitter(aes(lon, y = 5), width = 0, height = 3, colour = "red") +
+  scale_x_continuous(breaks = seq(-28, -25, by = 0.5))
+```
+
+The steps are:
+
+1. Create some pretty breaks, given the data and the specified resolution.
+2. Find break interval that each data point belongs to.
+3. Calculate the midpoint on the interval (here the longitude) that the each data-point belongs to.
+  
+  
+Lets create a horizontal vector (x) and specify the resolution:
+
+```{r}
+x <- d$lon
+dx <- 0.5
+```
+
+1. Creating the breaks, using floor and ceiling of the minimum and maximum value in the data to ensure that one has some "pretty" intervals:
+
+```{r}
+brks <- seq(floor(min(x)), ceiling(max(x)), dx)
+brks
+```
+
+Here we have created a vector that contains the "boundaries" of the bins we want for the horizontal data. The length of the vector is 7 but the bins (intervals) are 6.
+
+2. To find the interval position that a point belongs to we can use the `findInterval` function:
+
+```{r}
+# By using the argument all.inside = TRUE we assign the point to the lower break/interval position.
+ints <- findInterval(x, brks, all.inside = TRUE)
+ints
+```
+
+Here we have a vector that states that the 1st observation belongs to the 1st bin, 2nd to the 2nd bin, 3rd to the 5th bin and so on. We can easily count the number of values within each bin by:
+
+```{r}
+table(ints)
+```
+
+The values are equivalent to the counts that are the values on the y-axis in the histogram above. As it stands the intervals/bins are in relative terms, i.e. they are not scaled to the original data (in this case longitude). This we solve in the third step.
+
+3. The midpoint that a data point belongs to is just the average of the lower and upper boundary of the breaks that a point belongs to:
+
+```{r}
+x <- (brks[ints] + brks[ints + 1]) / 2
+x
+```
+
+Now since we are going to use this repeatedly in a workflow we may as well wrap the above three lines into a convenience function:
+
+```{r}
+grade <- function(x, dx) {
+  brks <- seq(floor(min(x)), ceiling(max(x)),dx)
+  ints <- findInterval(x, brks, all.inside = TRUE)
+  x <- (brks[ints] + brks[ints + 1]) / 2
+  return(x)
+}
+```
+
+To put the function into use we simply do:
+
+```{r}
+d %>% 
+  mutate(glon = grade(lon, dx = dx)) %>% 
+  group_by(glon) %>% 
+  summarise(n = n()) %>% 
+  knitr::kable()
+```
+
+We have the same count statistics as we got from the table call above, only now we have related the counts to a value of our data, rather than to a seqential bin-value.
+
+We can use the grade-function to assign both the longitudinal and latitudinal observations to a specified xy-grid within in a single mutation-call:
+
+```{r}
+d <- 
+  d %>% 
+  mutate(glon = grade(lon, dx = 0.50),
+         glat = grade(lat, dx = 0.25))
+d %>% paged_table()
+```
+
+One obtains a dataframe with the same amount of observations as the original, we have just added two more variables. One could now proceed with creating some summary statistics based on the gridded xy-values:
+
+```{r}
+df <-
+  d %>% 
+  group_by(glon, glat) %>% 
+  summarise(n = n(),
+            m = mean(effort),
+            s = sum(effort),
+            sd = sd(effort))
+# etc.
+df %>% ungroup() %>% paged_table()
+```
+
+So we have condensed the original 100 observations to a dataset that contains 23 observations (6 bins in the x-dimension times 4 in the y-dimension, minus one "missing" grid dimension). And now one is ready to visualize any statistics of interest, here we just choose to display the counts by colour codes using the ggplot raster function adding the original data as well:
+
+```{r}
+df %>% 
+  ungroup() %>% 
+  ggplot(aes(glon, glat)) +
+  geom_raster(aes(fill = s)) +
+  geom_point(data = d, aes(lon, lat), colour = "white", size = 0.5) +
+  geom_segment(data = d, aes(xend = lon, yend = lat), colour = "white") +
+  geom_text(aes(label = n), colour = "blue") +
+  scale_fill_viridis_c(option = "B", direction = -1) +
+  scale_x_continuous(breaks = seq(-28, -25, by = 0.5)) +
+  coord_quickmap() +
+  labs(x = NULL, y = NULL, fill = "Effort")
+```
+
+
+If one is interested in displaying other type of statistics, one could replace the variable name in the fill-argument in the geom_raster call above.

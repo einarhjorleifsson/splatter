@@ -1,0 +1,18 @@
+name: "test"
+title: "Splatter"
+description: |
+  Splatter
+base_url: https://heima.hafro.is/~einarhj
+output_dir: "_site"
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+collections:
+  posts:
+    disqus: aplatter
+    share: [twitter]
+    citations: false
+output: radix::radix_article
