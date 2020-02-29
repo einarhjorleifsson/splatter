@@ -1,8 +1,11 @@
-name: "test"
+name: "s-platter"
 title: "Splatter"
 description: |
-  Splatter
-base_url: https://heima.hafro.is/~einarhj
+  Some spur of the moment notes, mostly related to R
+base_url: https://heima.hafro.is/~einarhj/splatter/
+collections:
+  posts:
+    share: [twitter]
 output_dir: "_site"
 navbar:
   right:
@@ -10,9 +13,6 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
-collections:
-  posts:
-    disqus: aplatter
-    share: [twitter]
-    citations: false
-output: radix::radix_article
+    - icon: fab fa-github
+      href: https://github.com/einarhjorleifsson/splatter
+output: distill::distill_article
