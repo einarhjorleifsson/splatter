@@ -23,7 +23,7 @@
 
 <meta property="description" itemprop="description" content="Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The &quot;geoinside&quot; in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some &quot;insiders&quot;."/>
 
-<link rel="canonical" href="https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
+<link rel="canonical" href="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
 
 <!--  https://schema.org/Article -->
 <meta property="article:published" itemprop="datePublished" content="2019-01-17"/>
@@ -34,8 +34,8 @@
 <meta property="og:title" content="Splatter: Geoinside: Points in polygons via sf"/>
 <meta property="og:type" content="article"/>
 <meta property="og:description" content="Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The &quot;geoinside&quot; in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some &quot;insiders&quot;."/>
-<meta property="og:url" content="https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
-<meta property="og:image" content="https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png"/>
+<meta property="og:url" content="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
+<meta property="og:image" content="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png"/>
 <meta property="og:image:width" content="1248"/>
 <meta property="og:image:height" content="768"/>
 <meta property="og:locale" content="en_US"/>
@@ -45,14 +45,14 @@
 <meta property="twitter:card" content="summary_large_image"/>
 <meta property="twitter:title" content="Splatter: Geoinside: Points in polygons via sf"/>
 <meta property="twitter:description" content="Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The &quot;geoinside&quot; in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some &quot;insiders&quot;."/>
-<meta property="twitter:url" content="https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
-<meta property="twitter:image" content="https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png"/>
+<meta property="twitter:url" content="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
+<meta property="twitter:image" content="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png"/>
 <meta property="twitter:image:width" content="1248"/>
 <meta property="twitter:image:height" content="768"/>
 
 <!--  https://scholar.google.com/intl/en/scholar/inclusion.html#indexing -->
 <meta name="citation_title" content="Splatter: Geoinside: Points in polygons via sf"/>
-<meta name="citation_fulltext_html_url" content="https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
+<meta name="citation_fulltext_html_url" content="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"/>
 <meta name="citation_online_date" content="2019/01/17"/>
 <meta name="citation_publication_date" content="2019/01/17"/>
 <meta name="citation_author" content="Einar Hjörleifsson"/>
@@ -60,7 +60,7 @@
   <!--radix_placeholder_rmarkdown_metadata-->
 
 <script type="text/json" id="radix-rmarkdown-metadata">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","draft","citation_url","canonical_url"]}},"value":[{"type":"character","attributes":{},"value":["Geoinside: Points in polygons via sf"]},{"type":"character","attributes":{},"value":["Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The \"geoinside\" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some \"insiders\"."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Einar Hjörleifsson"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygon.html"]}},"value":[{"type":"NULL"}]}]}]},{"type":"character","attributes":{},"value":["2019-01-17"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"]},{"type":"character","attributes":{},"value":["https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","draft","citation_url","canonical_url"]}},"value":[{"type":"character","attributes":{},"value":["Geoinside: Points in polygons via sf"]},{"type":"character","attributes":{},"value":["Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The \"geoinside\" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some \"insiders\"."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Einar Hjörleifsson"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygon.html"]}},"value":[{"type":"NULL"}]}]}]},{"type":"character","attributes":{},"value":["2019-01-17"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]},{"type":"character","attributes":{},"value":["https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"]},{"type":"character","attributes":{},"value":["https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/"]}]}
 </script>
 <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -1295,7 +1295,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Geoinside: Points in polygons via sf","description":"Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The \"geoinside\" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some \"insiders\".","authors":[{"author":"Einar Hjörleifsson","authorURL":{"https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygon.html":{}},"affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-01-17T00:00:00.000+00:00","citationText":"Hjörleifsson, 2019"}
+{"title":"Geoinside: Points in polygons via sf","description":"Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The \"geoinside\" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some \"insiders\".","authors":[{"author":"Einar Hjörleifsson","authorURL":{"https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygon.html":{}},"affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2019-01-17T00:00:00.000+00:00","citationText":"Hjörleifsson, 2019"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1310,6 +1310,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <a href="../../about.html">About</a>
 <a href="https://github.com/einarhjorleifsson/splatter">
 <i class="fab fa-github"></i>
+</a>
+<a href="../../index.xml">
+<i class="fa fa-rss"></i>
 </a>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
 </div>
@@ -1527,12 +1530,12 @@ bbox:           xmin: -29 ymin: 64 xmax: -27 ymax: 65
 epsg (SRID):    4326
 proj4string:    +proj=longlat +datum=WGS84 +no_defs
 # A tibble: 4 x 2
-  Rectangle                                       geometry
-* &lt;chr&gt;                                   &lt;MULTIPOINT [°]&gt;
-1 57C1        (-29 64, -29 64.5, -28 64.5, -28 64, -27 64)
-2 57C2        (-28 64, -28 64.5, -27 64.5, -27 64, -28 64)
-3 58C1      (-29 64.5, -29 65, -28 65, -28 64.5, -27 64.5)
-4 58C2      (-28 64.5, -28 65, -27 65, -27 64.5, -28 64.5)</code></pre>
+  Rectangle                                                 geometry
+* &lt;chr&gt;                                             &lt;MULTIPOINT [°]&gt;
+1 57C1        ((-29 64), (-29 64.5), (-28 64.5), (-28 64), (-27 64))
+2 57C2        ((-28 64), (-28 64.5), (-27 64.5), (-27 64), (-28 64))
+3 58C1      ((-29 64.5), (-29 65), (-28 65), (-28 64.5), (-27 64.5))
+4 58C2      ((-28 64.5), (-28 65), (-27 65), (-27 64.5), (-28 64.5))</code></pre>
 </div>
 <p>Hmmm, this is a strange brew. The bottom line is that we have converted a dataframe of 20 records to only four records, one for each (ICES statistical) rectangle, with the five coordinates of each rectangle bundled into a single MULTIPOINT element.</p>
 <p>In the final step we turn the multipoint to polygon using the ‘st-cast’ function:</p>
@@ -1635,13 +1638,32 @@ proj4string:    +proj=longlat +datum=WGS84 +no_defs
 <!--radix_placeholder_article_footer-->
 <div class="article-footer">
   <p class="social_footer">
+    <span class="disqus-comments">
+      <i class="fas fa-comments"></i>
+      &nbsp;
+      <span class="disqus-comment-count" data-disqus-identifier="posts/2019-01-17-geoinside-points-in-polygons-via-sf/">Comment on this article</span>
+    </span>
     <span class="article-sharing">
       Share: &nbsp;
-      <a href="https://twitter.com/share?text=Geoinside%3A%20Points%20in%20polygons%20via%20sf&amp;url=https%3A%2F%2Fheima.hafro.is%2F~einarhj%2Fsplatter%2Fposts%2F2019-01-17-geoinside-points-in-polygons-via-sf%2F">
+      <a href="https://twitter.com/share?text=Geoinside%3A%20Points%20in%20polygons%20via%20sf&amp;url=https%3A%2F%2Fsplatter.netlify.com%2Fposts%2F2019-01-17-geoinside-points-in-polygons-via-sf%2F">
         <i class="fab fa-twitter"></i>
       </a>
     </span>
   </p>
+  <script id="dsq-count-scr" src="https://splatter.disqus.com/count.js" async></script>
+  <div id="disqus_thread" class="hidden"></div>
+  <script>
+var disqus_config = function () {
+  this.page.url = 'https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/';
+  this.page.identifier = 'posts/2019-01-17-geoinside-points-in-polygons-via-sf/';
+};
+(function() {
+  var d = document, s = d.createElement('script');
+  s.src = 'https://splatter.disqus.com/embed.js';
+  s.setAttribute('data-timestamp', +new Date());
+  (d.head || d.body).appendChild(s);
+})();
+</script>
 </div>
 <!--/radix_placeholder_article_footer-->
 </div>
@@ -1656,12 +1678,12 @@ proj4string:    +proj=longlat +datum=WGS84 +no_defs
 <div class="appendix-bottom">
   <h3 id="citation">Citation</h3>
   <p>For attribution, please cite this work as</p>
-  <pre class="citation-appendix short">Hjörleifsson (2019, Jan. 17). Splatter: Geoinside: Points in polygons via sf. Retrieved from https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/</pre>
+  <pre class="citation-appendix short">Hjörleifsson (2019, Jan. 17). Splatter: Geoinside: Points in polygons via sf. Retrieved from https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/</pre>
   <p>BibTeX citation</p>
   <pre class="citation-appendix long">@misc{hjörleifsson2019geoinside:,
   author = {Hjörleifsson, Einar},
   title = {Splatter: Geoinside: Points in polygons via sf},
-  url = {https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygons-via-sf/},
+  url = {https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/},
   year = {2019}
 }</pre>
 </div>

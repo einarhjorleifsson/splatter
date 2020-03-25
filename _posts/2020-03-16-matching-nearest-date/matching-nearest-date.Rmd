@@ -4,7 +4,6 @@ description: |
   This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.
 author:
   - name: Einar Hjörleifsson
-    url: https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html
 date: 03-16-2020
 output:
   distill::distill_article:

@@ -4,7 +4,7 @@ description: |
   Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The "geoinside" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some "insiders".
 author:
   - name: Einar Hjörleifsson
-    url: {https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygon.html}
+    url: {https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygon.html}
 date: 2019-01-17
 output:
   distill::distill_article:

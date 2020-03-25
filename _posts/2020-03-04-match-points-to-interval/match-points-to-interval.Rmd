@@ -4,8 +4,6 @@ description: |
   We have two datasets: 1) Captains logbook data were each activity (e.g. a fish trawl haul) is a record and has variables such start and end time as well as geographical start and end coordinates. 2) Vessel location data (VMS/AIS) were each record is spatial point in time. The VMS/AIS data are relatively frequent with short time interval between records (5 to 10 minutes), while the logbook data are relatively sparse with often relatively large time intervals (i.e. fishing activity is often in units of hours). This post demonstrate how one can match the two datasets containing multiple vessels using the foverlaps function from the data.table package.
 author:
   - name: Einar Hjörleifsson
-    url:
-      https://heima.hafro.is/~einarhj/splatter/posts/2020-03-04-match-points-to-interval.html
 date: 03-04-2020
 output:
   distill::distill_article:

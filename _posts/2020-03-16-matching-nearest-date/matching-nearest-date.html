@@ -44,7 +44,7 @@
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Matching nearest date"]},{"type":"character","attributes":{},"value":["This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Einar Hjörleifsson"]},{"type":"character","attributes":{},"value":["https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html"]}]}]},{"type":"character","attributes":{},"value":["03-16-2020"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Matching nearest date"]},{"type":"character","attributes":{},"value":["This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Einar Hjörleifsson"]},{"type":"character","attributes":{},"value":["https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date.html"]}]}]},{"type":"character","attributes":{},"value":["03-16-2020"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -942,7 +942,7 @@
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Matching nearest date","description":"This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.","authors":[{"author":"Einar Hjörleifsson","authorURL":"https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-03-16T00:00:00.000+00:00","citationText":"Hjörleifsson, 2020"}
+{"title":"Matching nearest date","description":"This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.","authors":[{"author":"Einar Hjörleifsson","authorURL":"https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date.html","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-03-16T00:00:00.000+00:00","citationText":"Hjörleifsson, 2020"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -957,7 +957,7 @@
 </div>
 
 <div class="d-byline">
-  Einar Hjörleifsson <a href="https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html" class="uri">https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html</a> 
+  Einar Hjörleifsson <a href="https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date.html" class="uri">https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date.html</a> 
   
 <br/>03-16-2020
 </div>
@@ -1012,7 +1012,7 @@ lb %&gt;%
   left_join(res3) %&gt;% 
   filter(datel != date.ln)</code></pre>
 <pre><code>
-# A tibble: 723,699 x 5
+# A tibble: 723,700 x 5
        visir   vid date       datel      date.ln   
        &lt;dbl&gt; &lt;int&gt; &lt;date&gt;     &lt;date&gt;     &lt;date&gt;    
  1 103832051     1 2014-06-05 2014-06-06 2003-03-03
@@ -1025,7 +1025,7 @@ lb %&gt;%
  8  26211927     7 1992-01-04 1992-01-06 1992-09-07
  9  26211930     7 1992-01-08 1992-01-09 1992-09-07
 10  26211929     7 1992-01-07 1992-01-09 1992-09-07
-# … with 723,689 more rows</code></pre>
+# … with 723,690 more rows</code></pre>
 <pre class="r"><code>
 res3 %&gt;% 
   mutate(diff = datel - date.ln) %&gt;% 
