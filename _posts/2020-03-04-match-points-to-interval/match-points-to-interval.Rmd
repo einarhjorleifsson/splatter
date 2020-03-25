@@ -300,11 +300,12 @@ So, now we can make a visualization of the fishing activity of some selected gea
 vms.lgs %>% 
   as_tibble() %>% 
   mutate(year = year(time),
-         quarter = quarter(time)) %>% 
+         month = month(time)) %>% 
+  # just so that the html file is not too big
   filter(!is.na(id.lgs),
-         gid %in% c(1, 6, 7, 9, 14),
+         gid %in% c(1, 6, 14),
          year == 2019,
-         quarter %in% 3,
+         month %in% 3,
          # some ad hoc extra filtering in case start and end are 
          #  not correct
          between(speed, 1.5, 6),
