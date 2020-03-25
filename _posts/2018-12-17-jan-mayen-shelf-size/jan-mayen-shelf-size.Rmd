@@ -1,0 +1,188 @@
+---
+title: "Jan Mayen shelf size"
+description: |
+  So, there has been some news on cod fisheries in [Jan Mayen](https://en.wikipedia.org/wiki/Jan_Mayen). In that context I became interested in knowing what was the size of the shelf area, a potential proxy for the order of magnitute of cod that this ecosystem could hold. As usual R-comes to the rescue.
+
+author:
+  - name: Einar Hjörleifsson
+    url: {https://heima.hafro.is/~einarhj/splatter/posts/2018-12-17-jan-mayen-shelf-size.html}
+date: 2018-12-17
+output:
+  distill::distill_article:
+    self_contained: false
+draft: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# Bathymetry data
+
+The only data we need is some depth raster information, here we use the [NOAA global relief database](https://www.ngdc.noaa.gov/mgg/global/global.html), accessing it from within R via the `getNOAA.bathy`-function that resides in the marmap-package. Beside that library we need the usual additional suspects:
+
+```{r}
+library(raster)
+library(sf)
+library(tidyverse)
+library(marmap)
+```
+
+The data for the Icelandic and Jan Mayen shelf we obtain by the following command:
+
+```{r, eval = FALSE}
+depth <- 
+  marmap::getNOAA.bathy(lon1 = -28.0, lon2 =  0.0,
+                      lat1 =  62.5, lat2 = 72.5,
+                      resolution = 1) %>% 
+  marmap::fortify.bathy() %>% 
+  as_tibble()
+```
+
+```{r, eval = FALSE, echo = FALSE}
+depth %>% write_rds("data/2018-12-17-jan-mayen-shelf-size.rds")
+```
+
+```{r, echo = FALSE}
+depth <- read_rds("../../data/2018-12-17-jan-mayen-shelf-size.rds")
+```
+
+
+What we have is:
+
+```{r}
+glimpse(depth)
+```
+
+Where the variable x and y are the Cartesian coordinates and z is the relief (value is negative for below sea-level).
+
+# Processing
+
+We need to isolate the area of interest a little further because we want to exclude any Greenland shelf area. So we first generate a polygon:
+
+```{r}
+clip <- 
+  data_frame(x = c(-28.0, -12,   -5, -7,  -20, -28,  -28.0),
+             y = c( 65.7,  72.5, 72, 64,   62, 63,   65.7)) %>% 
+  as.matrix() %>% 
+  st_linestring() %>% 
+  st_cast("POLYGON") %>% 
+  st_sfc() %>% 
+  st_set_crs(4326)
+```
+
+In the next step we:
+
+1. Generate a raster from the dataframe
+2. Create a contour for depths 100, 200, 300, 400 and 500 meters.
+3. Cut out any contours not of interest
+
+```{r}
+z <- 
+  depth %>% 
+  rasterFromXYZ() %>% 
+  rasterToContour(levels = c(-1, -100, -200, -300, -400, -500)) %>% 
+  st_as_sf() %>% 
+  st_cast("POLYGON") %>% 
+  st_set_crs(4326) %>% 
+  lwgeom::st_make_valid() %>% 
+  st_intersection(clip) %>% 
+  st_transform(crs = 32627) %>% 
+  st_cast("MULTILINESTRING") %>% 
+  mutate(z = -as.integer(as.character(level))) %>% 
+  select(-level)
+```
+
+Visually we have:
+
+```{r}
+ggplot() +
+  geom_sf(data = z %>% filter(z != 1), aes(colour = as.factor(z))) +
+  geom_sf(data = z %>% filter(z == 1) %>% st_cast("POLYGON"), fill = "black") +
+  scale_color_brewer(palette = "Set1") +
+  labs(colour = "depth")
+```
+
+# Estimating shelf area
+
+Here we separate the Jan Mayen and Iceland area and for each area calculate the size of the shelf from the shoreline to 100, 200, 300, 400 and 500 meter depths.
+
+We first calculate the size of each area separately, then merge the data and provide a summary graph.
+
+```{r}
+jm <- 
+  z %>% 
+  st_transform(4326) %>% 
+  st_crop(c(xmin = -15, ymin = 70, xmax = 0, ymax =  72.5)) %>% 
+  st_transform(32627) %>% 
+  st_cast("POLYGON") %>% 
+  mutate(area = abs(st_area(.)),
+         area = area - min(area),
+         area = units::set_units(area, km^2),
+         name = "Jan Mayen",
+         zone = paste0("0-", z))
+ice <-
+  z %>% 
+  st_transform(4326) %>% 
+  st_crop(c(xmin = -28, ymin = 62, xmax = 0, ymax =  68)) %>% 
+  st_transform(32627) %>% 
+  st_cast("POLYGON") %>% 
+  mutate(area = abs(st_area(.)),
+         area = area - min(area),
+         area = units::set_units(area, km^2),
+         name = "Iceland",
+         zone = paste0("0-", z))
+
+bind_rows(st_set_geometry(ice, NULL), st_set_geometry(jm, NULL)) %>% 
+  ggplot(aes(z, area, colour = name)) +
+  geom_point() +
+  geom_line() +
+  scale_color_brewer(palette = "Set1") +
+  coord_flip() +
+  scale_x_reverse(label = paste0("0-", seq(0, 500, by = 100))) +
+  theme(legend.position = c(0.8, 0.8)) +
+  labs(y = "Area [km^2]", x = "Depth range [m]", colour = "Area")
+```
+
+The proportion of the size of Jan Mayen depths relative to the equivalent depth range in Iceland is:
+
+```{r}
+bind_rows(st_set_geometry(ice, NULL) %>% mutate(area = as.numeric(area)),
+          st_set_geometry(jm, NULL) %>% mutate(area = as.numeric(area))) %>% 
+  mutate(area = as.numeric(area)) %>% 
+  spread(name, area) %>% 
+  mutate(p = 1 / (Iceland / `Jan Mayen`)) %>% 
+  ggplot(aes(z, p)) +
+  geom_point() +
+  scale_x_continuous(label = paste0("0-", seq(0, 500, by = 100))) +
+  labs(x = "Depth [m]", y = "Jan Mayen as a proportion if Icelandic shelf") +
+  expand_limits(y = 0)
+```
+
+Ergo, the size of any depth range of the shelf and slope of Jan Mayen is only 1-2.5% of equivalent depth range in Icelandic waters.
+
+Lets "move" the Jan Mayen shelf and slope into Icelandic waters, sort of to get a more direct visual comparison:
+
+```{r, preview=TRUE}
+jm.shifted <-
+  jm %>% 
+  st_geometry() %>% 
+  + c(-0.12e5, -0.4e6) %>% 
+  st_sf(z = jm$z,geometry = .) %>% 
+  st_set_crs(32627) %>% 
+  st_cast("MULTILINESTRING")
+ice <-
+  ice %>%
+  st_cast("MULTILINESTRING")
+
+ggplot() +
+  geom_sf(data = ice %>% filter(z != 1), aes(colour = as.factor(z))) +
+  geom_sf(data = jm.shifted %>% filter(z != 1), aes(colour = as.factor(z))) +
+  geom_sf(data = ice %>% filter(z == 1) %>% st_cast("POLYGON"), fill = "black") +
+  geom_sf(data = jm.shifted %>% filter(z == 1) %>% st_cast("POLYGON"), fill = "black") +
+  scale_color_brewer(palette = "Set1") +
+  labs(colour = "depth")
+```
+
+So, the Jan Mayen shelf is only about the size of Digranesgrunn. It is thus very unlikely that one can expect large sustained catches in Jan Mayen, neither now or in the foreseeable future. High catch rates like are now reported are also not expected to last over the long run.
+

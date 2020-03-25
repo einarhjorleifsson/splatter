@@ -1,0 +1,343 @@
+---
+title: "Match points to interval"
+description: |
+  We have two datasets: 1) Captains logbook data were each activity (e.g. a fish trawl haul) is a record and has variables such start and end time as well as geographical start and end coordinates. 2) Vessel location data (VMS/AIS) were each record is spatial point in time. The VMS/AIS data are relatively frequent with short time interval between records (5 to 10 minutes), while the logbook data are relatively sparse with often relatively large time intervals (i.e. fishing activity is often in units of hours). This post demonstrate how one can match the two datasets containing multiple vessels using the foverlaps function from the data.table package.
+author:
+  - name: Einar Hjörleifsson
+    url:
+      https://heima.hafro.is/~einarhj/splatter/posts/2020-03-04-match-points-to-interval.html
+date: 03-04-2020
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+```{r}
+library(data.table)
+library(sf)
+library(mapdeck)
+library(lubridate)
+library(tidyverse)
+```
+
+## The example data
+
+To convey the concept and method we are going to use a relatively simple example dataset as a starter, using a larger more realistic dataset further downstream in this post.
+
+The **VMS/AIS** example dataset contain 8918 [AIS](https://en.wikipedia.org/wiki/Automatic_identification_system)/[VMS](https://en.wikipedia.org/wiki/Vessel_monitoring_system) records of time and position of four vessels that participated in the Icelandic spring survey in 2019. The data are available on the web and can be read in and viewed as follows:
+
+```{r}
+vms <-
+  read_csv("ftp://ftp.hafro.is/pub/data/csv/is_smb_vms2019.csv") %>%
+  arrange(time) %>% 
+  select(vid, lon, lat, speed, heading, time)
+glimpse(vms)
+```
+
+The variable **vid** is the vessel identification number, **lon** and **lat** are the spatial coordinates, other variables being self explanatory.
+
+The **Logbook** dataset contain 581 trawl hauls from the four vessels. The data are available on the web and can be read in and viewed as follows:
+
+```{r}
+lgs <-
+  read_csv("ftp://ftp.hafro.is/pub/data/csv/is_smb_stations.csv") %>%
+  filter(year == 2019) %>%
+  arrange(t1, t2) %>% 
+  select(id.lgs = id, vid, lon.start = lon1, lat.start = lat1,
+         lon.end = lon2, lat.end = lat2, start = t1, end = t2)
+glimpse(lgs)
+```
+
+The variable **id.lgs** is a unique haul identifier that is used to link auxiliary haul data (e.g. catch by species) not shown here. It and the variables *vid*, **start** and **end** time of the haul operation are the key variables used when merging the logbook dataset and the vms dataset.
+
+## A visual peek of the two datasets
+
+A spatial view of the two datasets can be generated as follows:
+
+```{r, echo = FALSE}
+set_token(read_rds("/net/hafkaldi/export/home/haf/einarhj/prj2/splatter/key.rds"))
+```
+
+```{r}
+# converting the logbooks to wide format in order to generate spatial-lines,
+#  done for visualization
+tows <- 
+  lgs %>% 
+  select(id.lgs, x1 = lon.start, x2 = lon.end, y1 = lat.start, y2 = lat.end) %>% 
+  pivot_longer(-id.lgs,
+               names_to = c(".value", "set"),
+               names_pattern = "(.)(.)") %>% 
+  arrange(id.lgs) %>% 
+  st_as_sf(coords = c("x", "y"),
+           crs = 4326) %>% 
+  group_by(id.lgs) %>% 
+  summarise(do_union = FALSE) %>% 
+  st_cast("LINESTRING")
+
+mapdeck(style = 'mapbox://styles/mapbox/dark-v9',
+        location = c(-22.9, 66.15),
+        zoom = 8) %>% 
+  add_path(data = tows,
+           stroke_colour = "#AAFFFFFF",
+           stroke_width = 1000,
+           update_view = FALSE) %>% 
+  add_scatterplot(data = vms,
+                  lon = "lon", 
+                  lat = "lat",
+                  radius = 250,
+                  fill_colour = "speed",
+                  palette = "inferno",
+                  update_view = FALSE)
+  
+```
+
+In the figure above the cyan coloured lines represents the tows (logbook data) while the dots are records in the AIS/VMS data, colour indicating vessel speed. What we are interested is identifying the records (dots) in the AIS/VMS data that fall within the start and end of a tow as fishing.
+
+Now, here the problem will not be solved by some spatial acrobatics but time. A visual temporal representation of the two datasets can be made via the following code:
+
+```{r}
+ggplot() +
+  theme_bw() +
+  geom_rect(data = lgs,
+            aes(xmin = start, xmax = end),
+            ymin = -Inf, ymax = Inf,
+            fill = "cyan",
+            alpha = 0.5) + 
+  geom_point(data = vms, aes(time, speed), size = 1) +
+  geom_text(data = lgs,
+            aes(start + (end - start) / 2, 12, label = id.lgs),
+            angle = 90,
+            size = 3,
+            colour = "red",
+            hjust=1) +
+  facet_grid(vid ~ .) +
+  scale_x_datetime(limits = c(ymd_hms("2019-03-13 00:00:00"),
+                              ymd_hms("2019-03-14 00:00:00")))
+```
+
+The plot shows one day of activity, where:
+
+* Each panel represents one of the four vessels (variable vid)
+* The cyan area represents the interval between the recorded start and end time of a haul
+* The red text indicates the logbook tow id (id.lgs).
+* The points represents the vms-ping observations, instantaneous vessel speed being indicated by the y-axis.
+
+The main objective is to assign the logbook tow id to the vms-points that fall within the interval between start and end of the hauls.
+
+## Matching the point to interval
+
+In the above visualization the logbook and the vms data are still independent of each other, the "matching" only done by adding layers to a plot. We now turn to our main objective, merging the two datasets.
+
+We first convert the two datasets into class data.table:
+
+```{r}
+vms.dt <-
+  vms %>%
+  arrange(time) %>% 
+  mutate(dummy = time) %>% 
+  data.table()
+lgs.dt <-
+  lgs %>%
+  arrange(start, end) %>%
+  data.table()
+```
+
+In the above we create a dummy time variable for the vms-data because we are effectively basing the merging on intervals. And in the case of the vms-data the interval is effectively "instantaneous" because the variable time and dummy are the same.
+
+The next step is to sort the data.tables and mark them as such.
+
+```{r}
+setkey(vms.dt, vid, time, dummy)
+setkey(lgs.dt, vid, start, end)
+```
+
+Using the vessel identification number (vid) when setting up the keys can be considered as a group-ing variable.
+
+We are now ready to merge the data using the foverlaps-function:
+
+```{r}
+vms.lgs <- 
+  foverlaps(vms.dt, lgs.dt, nomatch = NA)
+nrow(vms) == nrow(vms.lgs)
+```
+
+Take note that the number of rows in the merged dataset is the same as in the original vms dataset.
+
+```{r, echo = FALSE, eval = FALSE}
+# NOTE: this is really what we are after, a lookup only returning the variable id.lgs
+vms.dt$id.lgs <- foverlaps(vms.dt, lgs.dt, nomatch = NA)$id.lgs
+```
+
+
+Lets see what we have created (only showing variable of interest):
+
+```{r}
+vms.lgs %>% 
+  slice(196:203) %>% 
+  select(vid, lon:time, start, end, id.lgs)
+```
+
+The variables **lon**, **lat**, **speed** and **heading** are from the vms-dataset while the variable **id.lgs** (representing unique tow identifier) is from the logbook dataset. The variable **vid** (common in both sets) and **time** (from the vms), **start** and **end** (both from the logbook dataset) were used to merge the data. The above sets shows only the merge time series for one haul (unique identifier being 490612), with the first and the last data-point from the vms dataset just outside the time interval of that single haul (hence missing values in the original logbook variables).
+
+We can now view this merged dataset as was done above, but using colour to indicate the vms-points that constitute actual fishing operation (coloured by the variable **id.lgs**):
+
+```{r}
+vms.lgs %>% 
+  filter(between(time, ymd_hms("2019-03-13 00:00:00"), ymd_hms("2019-03-14 00:00:00"))) %>% 
+  ggplot() +
+  theme_bw() +
+  geom_rect(aes(xmin = start, xmax = end),
+            ymin = -Inf, ymax = Inf,
+            fill = "grey",
+            alpha = 0.25) + 
+  geom_point(aes(time, speed), size = 1) +
+  geom_point(aes(time, speed, colour = as.character(id.lgs)), size = 1) +
+  facet_grid(vid ~ .) +
+  ggmisc::scale_colour_crayola() +
+  theme(legend.position = "none")
+```
+
+Spatially we have (zooming into one area):
+
+```{r}
+vms.lgs %>%
+  as_tibble() %>%
+  select(-dummy) %>% 
+  mutate(fishing = ifelse(!is.na(id.lgs), TRUE, FALSE)) %>% 
+  mutate(id.lgs = ifelse(!is.na(id.lgs), id.lgs, -999)) %>% 
+  ggplot() +
+  theme_bw() +
+  geom_path(data = geo::bisland, aes(lon, lat)) +
+  geom_point(aes(lon, lat, colour = as.character(id.lgs)),
+             size = 1) +
+  coord_quickmap(xlim = c(-25, -23), ylim = c(66, 66.5)) +
+  theme(legend.position = c(0.5, 0.4)) +
+  #scale_colour_brewer(palette = "Set1") +
+  ggmisc::scale_colour_crayola() +
+  labs(x = NULL, y = NULL) +
+  theme(legend.position = "none")
+```
+
+## How does foverlaps scale?
+
+Here we are going to use data that reside in a database to test how scalable the foverlaps function is. The format of the data is the same as used in the example above and hence detail explanation are not given in the text below. The data used are AIS/VMS and logbook data of the Icelandic commercial fishing fleet over the years 2012 to 2019.
+
+```{r}
+library(mar)
+con <- connect_mar()
+vms <- 
+  stk_trail(con) %>% 
+  mutate(year = year(time)) %>% 
+  filter(year %in% 2012:2019) %>% 
+  inner_join(mar:::stk_mid_vid(con) %>% 
+               select(mid, vid) %>% 
+               filter(!is.na(vid))) %>% 
+  select(vid, time, lon, lat, speed) %>% 
+  collect(n = Inf)
+glimpse(vms)
+```
+
+So we have `r nrow(vms)` vms records.
+
+```{r}
+mbl <- 
+  mar:::lb_base(con) %>% 
+  mutate(year = year(date)) %>% 
+  filter(year %in% 2012:2019) %>% 
+  inner_join(mar:::lb_mobile(con)) %>% 
+  select(id.lgs = visir,
+         vid,
+         gid,
+         start = t1,
+         end = t2) %>% 
+  filter(!is.na(start), !is.na(end)) %>% 
+  collect(n = Inf)
+sta <- 
+  mar:::lb_base(con) %>% 
+  mutate(year = year(date)) %>% 
+  filter(year %in% 2012:2019) %>% 
+  inner_join(mar:::lb_static(con)) %>% 
+  select(id.lgs = visir,
+         vid,
+         gid,
+         start = t1,
+         end = t2) %>% 
+  filter(!is.na(start), !is.na(end)) %>% 
+  collect(n = Inf)
+lgs <- 
+  bind_rows(mbl, sta) %>% 
+  filter(start < end)
+glimpse(lgs)
+```
+
+And we have `r nrow(lgs)` logbook records.
+
+```{r}
+vms.dt <- 
+  vms %>% 
+  arrange(time) %>% 
+  mutate(dummy = time) %>% 
+  data.table()
+lgs.dt <-
+  lgs %>%
+  arrange(start, end) %>%
+  data.table()
+setkey(vms.dt, vid, time, dummy)
+setkey(lgs.dt, vid, start, end)
+system.time(vms.lgs <- 
+  foverlaps(vms.dt, lgs.dt, nomatch = NA))
+```
+
+That was impressively fast ^[Note: the number of records in the merge data are not the same as in the original vms data (somewhat higher in the former), this most likely a result in multiple overlaps because of incorrect recording of start and end time in the logbooks. Something to look at later.]. Mind you, this was run on a computer with 251G memory. And the preprocessing, prior to this last step took some 10's of minutes.
+
+So, now we can make a visualization of the fishing activity of some selected gear in the third quarter of 2019 based on the AIS/VMS geographical coordinates: 
+
+```{r}
+vms.lgs %>% 
+  as_tibble() %>% 
+  mutate(year = year(time),
+         quarter = quarter(time)) %>% 
+  filter(!is.na(id.lgs),
+         gid %in% c(1, 6, 7, 9, 14),
+         year == 2019,
+         quarter %in% 3,
+         # some ad hoc extra filtering in case start and end are 
+         #  not correct
+         between(speed, 1.5, 6),
+         between(lon, -30, 10),
+         between(lat, 61, 69)) %>% 
+  select(lon, lat, speed, gid) %>% 
+  mutate(gear = case_when(gid == 1 ~ "Longline",
+                          gid == 6 ~ "Demersal fishtrawl",
+                          gid == 7 ~ "Pelagic trawl",
+                          gid == 9 ~ "Nephrops trawl",
+                          gid == 14 ~ "Shrimp trawl")) %>% 
+  mapdeck(style = 'mapbox://styles/mapbox/dark-v9') %>% 
+  add_scatterplot(lon = "lon", 
+                  lat = "lat",
+                  radius = 250,
+                  fill_colour = "gear",
+                  palette = "topo",
+                  legend = TRUE)
+```
+
+That's all for now.
+
+```{r, echo = FALSE, eval = FALSE}
+## Further scale test
+# In order to get a more accurate
+grd <- 
+  expand.grid(time = seq(ymd_hms("2019-01-01 00:00:00"),
+                         ymd_hms("2029-12-31 23:59:00"),
+                         by = "1 min"),
+              stringsAsFactors = FALSE) %>% 
+  as_tibble()
+```
+
+
+
+

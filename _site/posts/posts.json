@@ -1,0 +1,91 @@
+[
+  {
+    "path": "posts/2020-03-16-matching-nearest-date/",
+    "title": "Matching nearest date",
+    "description": "This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.",
+    "author": [
+      {
+        "name": "Einar Hjörleifsson",
+        "url": "https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html"
+      }
+    ],
+    "date": "2020-03-16",
+    "categories": [],
+    "preview": "posts/2020-03-16-matching-nearest-date/matching-nearest-date_files/figure-html5/unnamed-chunk-2-1.png",
+    "last_modified": "2020-03-16T22:35:39+00:00",
+    "preview_width": 1248,
+    "preview_height": 768
+  },
+  {
+    "path": "posts/2020-03-04-match-points-to-interval/",
+    "title": "Match points to interval",
+    "description": "We have two datasets: 1) Captains logbook data were each activity (e.g. a fish trawl haul) is a record and has variables such start and end time as well as geographical start and end coordinates. 2) Vessel location data (VMS/AIS) were each record is spatial point in time. The VMS/AIS data are relatively frequent with short time interval between records (5 to 10 minutes), while the logbook data are relatively sparse with often relatively large time intervals (i.e. fishing activity is often in units of hours). This post demonstrate how one can match the two datasets containing multiple vessels using the foverlaps function from the data.table package.",
+    "author": [
+      {
+        "name": "Einar Hjörleifsson",
+        "url": "https://heima.hafro.is/~einarhj/splatter/posts/2020-03-04-match-points-to-interval.html"
+      }
+    ],
+    "date": "2020-03-04",
+    "categories": [],
+    "preview": "posts/2020-03-04-match-points-to-interval/match-points-to-interval_files/figure-html5/unnamed-chunk-6-1.png",
+    "last_modified": "2020-03-11T12:41:52+00:00",
+    "preview_width": 1248,
+    "preview_height": 768
+  },
+  {
+    "path": "posts/2019-01-17-geoinside-points-in-polygons-via-sf/",
+    "title": "Geoinside: Points in polygons via sf",
+    "description": "Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The \"geoinside\" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some \"insiders\".",
+    "author": [
+      {
+        "name": "Einar Hjörleifsson",
+        "url": {
+          "https://heima.hafro.is/~einarhj/splatter/posts/2019-01-17-geoinside-points-in-polygon.html": {}
+        }
+      }
+    ],
+    "date": "2019-01-17",
+    "categories": [],
+    "preview": "posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png",
+    "last_modified": "2020-02-29T13:16:02+00:00",
+    "preview_width": 1248,
+    "preview_height": 768
+  },
+  {
+    "path": "posts/2018-12-17-jan-mayen-shelf-size/",
+    "title": "Jan Mayen shelf size",
+    "description": "So, there has been some news on cod fisheries in [Jan Mayen](https://en.wikipedia.org/wiki/Jan_Mayen). In that context I became interested in knowing what was the size of the shelf area, a potential proxy for the order of magnitute of cod that this ecosystem could hold. As usual R-comes to the rescue.",
+    "author": [
+      {
+        "name": "Einar Hjörleifsson",
+        "url": {
+          "https://heima.hafro.is/~einarhj/splatter/posts/2018-12-17-jan-mayen-shelf-size.html": {}
+        }
+      }
+    ],
+    "date": "2018-12-17",
+    "categories": [],
+    "preview": "posts/2018-12-17-jan-mayen-shelf-size/jan-mayen-shelf-size_files/figure-html5/unnamed-chunk-11-1.png",
+    "last_modified": "2020-02-29T13:10:07+00:00",
+    "preview_width": 1248,
+    "preview_height": 768
+  },
+  {
+    "path": "posts/2018-02-03-on-gridding-spatial-data/",
+    "title": "On gridding spatial data",
+    "description": "Lets say we have some spatial observations and wanted to calculate some summary metric (count, sum, mean, variance, …) based on specified spacial gridding of the raw data.",
+    "author": [
+      {
+        "name": "Einar Hjörleifsson",
+        "url": {}
+      }
+    ],
+    "date": "2018-02-03",
+    "categories": [],
+    "preview": "posts/2018-02-03-on-gridding-spatial-data/on-gridding-spatial-data_files/figure-html5/unnamed-chunk-14-1.png",
+    "last_modified": "2020-02-29T13:09:41+00:00",
+    "preview_width": 1248,
+    "preview_height": 768
+  }
+]

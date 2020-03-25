@@ -1,0 +1,80 @@
+---
+title: "Matching nearest date"
+description: |
+  This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.
+author:
+  - name: Einar Hjörleifsson
+    url: https://heima.hafro.is/~einarhj/splatter/posts/2020-03-16-matching-nearest-date.html
+date: 03-16-2020
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+bla, bla, bla ...
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+
+```{r}
+library(data.table)
+library(lubridate)
+library(tidyverse)
+library(mar)
+con <- connect_mar()
+```
+
+```{r}
+lb <- 
+  mar:::lb_base(con) %>%
+  mutate(year = year(date)) %>%
+  filter(year %in% 1992:2019) %>% 
+  select(visir, vid, date, datel) %>%
+  distinct() %>% 
+  collect(n = Inf) %>% 
+  mutate(date = as_date(date),
+         datel = as_date(datel)) %>% 
+  arrange(vid, datel) %>% 
+  drop_na()
+
+lb.dt <- 
+  lb %>% 
+  select(vid, datel) %>% 
+  distinct() %>% 
+  setDT()
+ln.dt <- 
+  mar:::ln_catch(con) %>%
+  mutate(year = year(date)) %>%
+  filter(year %in% 1992:2019) %>% 
+  select(vid, datel = date) %>% 
+  distinct() %>% 
+  collect(n = Inf) %>% 
+  mutate(datel = as_date(datel)) %>% 
+  arrange(vid, datel) %>% 
+  drop_na() %>% 
+  mutate(dummy = datel) %>% 
+  setDT()
+
+res3 <- 
+  lb.dt[, date.ln := ln.dt[lb.dt, dummy, on = c("vid", "datel"), roll = "nearest"]] %>% 
+    as_tibble()
+
+lb %>% 
+  left_join(res3) %>% 
+  filter(datel != date.ln)
+
+res3 %>% 
+  mutate(diff = datel - date.ln) %>% 
+  count(diff) %>% 
+  mutate(diff = as.integer(diff)) %>% 
+  mutate(diff = ifelse(diff < -5, -5, diff),
+         diff = ifelse(diff >  5,  5, diff)) %>% 
+  filter(diff != 0L) %>% 
+  ggplot(aes(diff, n)) +
+  geom_col()
+
+```
+

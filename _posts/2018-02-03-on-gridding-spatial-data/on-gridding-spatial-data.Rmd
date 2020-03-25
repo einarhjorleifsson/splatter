@@ -3,7 +3,7 @@ title: "On gridding spatial data"
 description: |
   Lets say we have some spatial observations and wanted to calculate some summary metric (count, sum, mean, variance, …) based on specified spacial gridding of the raw data.
 author:
-  - name: einarhjorleifsson
+  - name: Einar Hjörleifsson
 date: 2018-02-03
 output:
   distill::distill_article:
