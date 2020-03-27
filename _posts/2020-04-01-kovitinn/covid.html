@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
   <meta name="generator" content="distill" />
-  <link rel="alternate" type="application/rss+xml" href="https://splatter.netlify.com/index.xml" />
 
   <style type="text/css">
   /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
@@ -20,366 +19,39 @@
  <!--/radix_placeholder_import_source-->
 
   <!--radix_placeholder_meta_tags-->
-  <title>Splatter: </title>
+  <title>Kóvitinn</title>
+  
+  <meta property="description" itemprop="description" content="Have been exploring the covid data a bit lately (who has not) and thought writing down&#10;some notes. This blogs takes you through downloading, tidying and exploring the &#10;global Johns Hopkins University (JHU) data. Some of the visualization you may &#10;already have seen on various media, others may be a little bit more novice. Because&#10;me myself I comes from a very small nation I am particularily interested in the per&#10;capita numerics. And because I am aware that there are a lot of people interested in the &#10;covid data but are not very fluent in R I take a little bit of a step-by-step approach.&#10;If only so that more of us start to appreciate the power of R."/>
   
   
-  
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2020-04-01"/>
+  <meta property="article:created" itemprop="dateCreated" content="2020-04-01"/>
+  <meta name="article:author" content="Einar Hjörleifsson"/>
   
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Splatter: "/>
+  <meta property="og:title" content="Kóvitinn"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:description" content="Have been exploring the covid data a bit lately (who has not) and thought writing down&#10;some notes. This blogs takes you through downloading, tidying and exploring the &#10;global Johns Hopkins University (JHU) data. Some of the visualization you may &#10;already have seen on various media, others may be a little bit more novice. Because&#10;me myself I comes from a very small nation I am particularily interested in the per&#10;capita numerics. And because I am aware that there are a lot of people interested in the &#10;covid data but are not very fluent in R I take a little bit of a step-by-step approach.&#10;If only so that more of us start to appreciate the power of R."/>
   <meta property="og:locale" content="en_US"/>
-  <meta property="og:site_name" content="Splatter"/>
   
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Splatter: "/>
+  <meta property="twitter:title" content="Kóvitinn"/>
+  <meta property="twitter:description" content="Have been exploring the covid data a bit lately (who has not) and thought writing down&#10;some notes. This blogs takes you through downloading, tidying and exploring the &#10;global Johns Hopkins University (JHU) data. Some of the visualization you may &#10;already have seen on various media, others may be a little bit more novice. Because&#10;me myself I comes from a very small nation I am particularily interested in the per&#10;capita numerics. And because I am aware that there are a lot of people interested in the &#10;covid data but are not very fluent in R I take a little bit of a step-by-step approach.&#10;If only so that more of us start to appreciate the power of R."/>
   
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","site","listing"]}},"value":[{"type":"character","attributes":{},"value":[""]},{"type":"character","attributes":{},"value":["distill::distill_website"]},{"type":"character","attributes":{},"value":["posts"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","draft"]}},"value":[{"type":"character","attributes":{},"value":["Kóvitinn"]},{"type":"character","attributes":{},"value":["Have been exploring the covid data a bit lately (who has not) and thought writing down\nsome notes. This blogs takes you through downloading, tidying and exploring the \nglobal Johns Hopkins University (JHU) data. Some of the visualization you may \nalready have seen on various media, others may be a little bit more novice. Because\nme myself I comes from a very small nation I am particularily interested in the per\ncapita numerics. And because I am aware that there are a lot of people interested in the \ncovid data but are not very fluent in R I take a little bit of a step-by-step approach.\nIf only so that more of us start to appreciate the power of R.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Einar Hjörleifsson"]},{"type":"character","attributes":{},"value":["https://splatter.netlify.com/posts/2020-04-01-kovitinn.html"]}]}]},{"type":"character","attributes":{},"value":["04-01-2020"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"logical","attributes":{},"value":[false]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
-  <!--radix_placeholder_navigation_in_header-->
   
-  <script type="application/javascript">
-  
-    window.headroom_prevent_pin = false;
-  
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-  
-      // initialize headroom for banner
-      var header = $('header').get(0);
-      var headerHeight = header.offsetHeight;
-      var headroom = new Headroom(header, {
-        onPin : function() {
-          if (window.headroom_prevent_pin) {
-            window.headroom_prevent_pin = false;
-            headroom.unpin();
-          }
-        }
-      });
-      headroom.init();
-      if(window.location.hash)
-        headroom.unpin();
-      $(header).addClass('headroom--transition');
-  
-      // offset scroll location for banner on hash change
-      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
-      window.addEventListener("hashchange", function(event) {
-        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
-      });
-  
-      // responsive menu
-      $('.distill-site-header').each(function(i, val) {
-        var topnav = $(this);
-        var toggle = topnav.find('.nav-toggle');
-        toggle.on('click', function() {
-          topnav.toggleClass('responsive');
-        });
-      });
-  
-      // nav dropdowns
-      $('.nav-dropbtn').click(function(e) {
-        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
-        $(this).parent().siblings('.nav-dropdown')
-           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $("body").click(function(e){
-        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $(".nav-dropdown").click(function(e){
-        e.stopPropagation();
-      });
-    });
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["covid_files/bowser-1.9.3/bowser.min.js","covid_files/distill-2.2.21/template.v2.js","covid_files/figure-html5/unnamed-chunk-3-1.png","covid_files/figure-html5/unnamed-chunk-5-1.png","covid_files/figure-html5/unnamed-chunk-6-1.png","covid_files/figure-html5/unnamed-chunk-7-1.png","covid_files/jquery-1.11.3/jquery.min.js","covid_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
-  
-  <style type="text/css">
-  
-  /* Theme (user-documented overrideables for nav appearance) */
-  
-  .distill-site-nav {
-    color: rgba(255, 255, 255, 0.8);
-    background-color: #455a64;
-    font-size: 15px;
-    font-weight: 300;
-  }
-  
-  .distill-site-nav a {
-    color: inherit;
-    text-decoration: none;
-  }
-  
-  .distill-site-nav a:hover {
-    color: white;
-  }
-  
-  @media print {
-    .distill-site-nav {
-      display: none;
-    }
-  }
-  
-  .distill-site-header {
-  
-  }
-  
-  .distill-site-footer {
-  
-  }
-  
-  
-  /* Site Header */
-  
-  .distill-site-header {
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 3;
-  }
-  
-  .distill-site-header .nav-left {
-    display: inline-block;
-    margin-left: 8px;
-  }
-  
-  @media screen and (max-width: 768px) {
-    .distill-site-header .nav-left {
-      margin-left: 0;
-    }
-  }
-  
-  
-  .distill-site-header .nav-right {
-    float: right;
-    margin-right: 8px;
-  }
-  
-  .distill-site-header a,
-  .distill-site-header .title {
-    display: inline-block;
-    text-align: center;
-    padding: 14px 10px 14px 10px;
-  }
-  
-  .distill-site-header .title {
-    font-size: 18px;
-  }
-  
-  .distill-site-header .logo {
-    padding: 0;
-  }
-  
-  .distill-site-header .logo img {
-    display: none;
-    max-height: 20px;
-    width: auto;
-    margin-bottom: -4px;
-  }
-  
-  .distill-site-header .nav-image img {
-    max-height: 18px;
-    width: auto;
-    display: inline-block;
-    margin-bottom: -3px;
-  }
-  
-  
-  
-  @media screen and (min-width: 1000px) {
-    .distill-site-header .logo img {
-      display: inline-block;
-    }
-    .distill-site-header .nav-left {
-      margin-left: 20px;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 20px;
-    }
-    .distill-site-header .title {
-      padding-left: 12px;
-    }
-  }
-  
-  
-  .distill-site-header .nav-toggle {
-    display: none;
-  }
-  
-  .nav-dropdown {
-    display: inline-block;
-    position: relative;
-  }
-  
-  .nav-dropdown .nav-dropbtn {
-    border: none;
-    outline: none;
-    color: rgba(255, 255, 255, 0.8);
-    padding: 16px 10px;
-    background-color: transparent;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    margin: 0;
-    margin-top: 1px;
-    z-index: 2;
-  }
-  
-  .nav-dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 200px;
-    border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 4px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
-    z-index: 1;
-    margin-top: 2px;
-    white-space: nowrap;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-  
-  .nav-dropdown-content hr {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-  
-  .nav-dropdown-active {
-    display: block;
-  }
-  
-  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
-    color: black;
-    padding: 6px 24px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-  }
-  
-  .nav-dropdown-content .nav-dropdown-header {
-    display: block;
-    padding: 5px 24px;
-    padding-bottom: 0;
-    text-transform: uppercase;
-    font-size: 14px;
-    color: #999999;
-    white-space: nowrap;
-  }
-  
-  .nav-dropdown:hover .nav-dropbtn {
-    color: white;
-  }
-  
-  .nav-dropdown-content a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-  
-  .nav-right .nav-dropdown-content {
-    margin-left: -45%;
-    right: 0;
-  }
-  
-  @media screen and (max-width: 768px) {
-    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
-    .distill-site-header a.nav-toggle {
-      float: right;
-      display: block;
-    }
-    .distill-site-header .title {
-      margin-left: 0;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 0;
-    }
-    .distill-site-header {
-      overflow: hidden;
-    }
-    .nav-right .nav-dropdown-content {
-      margin-left: 0;
-    }
-  }
-  
-  
-  @media screen and (max-width: 768px) {
-    .distill-site-header.responsive {position: relative;}
-    .distill-site-header.responsive a.nav-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-    }
-    .distill-site-header.responsive a,
-    .distill-site-header.responsive .nav-dropdown {
-      display: block;
-      text-align: left;
-    }
-    .distill-site-header.responsive .nav-left,
-    .distill-site-header.responsive .nav-right {
-      width: 100%;
-    }
-    .distill-site-header.responsive .nav-dropdown {float: none;}
-    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
-    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
-      display: block;
-      width: 100%;
-      text-align: left;
-    }
-  }
-  
-  /* Site Footer */
-  
-  .distill-site-footer {
-    width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-    z-index: 3;
-    margin-top: 30px;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    text-align: center;
-  }
-  
-  /* Headroom */
-  
-  d-title {
-    padding-top: 6rem;
-  }
-  
-  @media print {
-    d-title {
-      padding-top: 4rem;
-    }
-  }
-  
-  .headroom {
-    z-index: 1000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-  
-  .headroom--transition {
-    transition: all .4s ease-in-out;
-  }
-  
-  .headroom--unpinned {
-    top: -100px;
-  }
-  
-  .headroom--pinned {
-    top: 0;
-  }
-  
-  </style>
-  
-  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
-  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
-  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
+  <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
   <!--radix_placeholder_distill-->
   
@@ -1255,467 +927,252 @@
   </script>
   
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
-  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
-  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
-  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <script src="covid_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="covid_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="covid_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="covid_files/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
   <!--/radix_placeholder_site_in_header-->
 
 
 </head>
 
-<body class="layout-listing">
+<body>
 
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"","authors":[]}
+{"title":"Kóvitinn","description":"Have been exploring the covid data a bit lately (who has not) and thought writing down\nsome notes. This blogs takes you through downloading, tidying and exploring the \nglobal Johns Hopkins University (JHU) data. Some of the visualization you may \nalready have seen on various media, others may be a little bit more novice. Because\nme myself I comes from a very small nation I am particularily interested in the per\ncapita numerics. And because I am aware that there are a lot of people interested in the \ncovid data but are not very fluent in R I take a little bit of a step-by-step approach.\nIf only so that more of us start to appreciate the power of R.","authors":[{"author":"Einar Hjörleifsson","authorURL":"https://splatter.netlify.com/posts/2020-04-01-kovitinn.html","affiliation":"&nbsp;","affiliationURL":"#"}],"publishedDate":"2020-04-01T00:00:00.000+00:00","citationText":"Hjörleifsson, 2020"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
 <!--radix_placeholder_navigation_before_body-->
-<header class="header header--fixed" role="banner">
-<nav class="distill-site-nav distill-site-header">
-<div class="nav-left">
-<a href="index.html" class="title">Splatter</a>
-</div>
-<div class="nav-right">
-<a href="index.html">Home</a>
-<a href="about.html">About</a>
-<a href="https://github.com/einarhjorleifsson/splatter">
-<i class="fab fa-github"></i>
-</a>
-<a href="index.xml">
-<i class="fa fa-rss"></i>
-</a>
-<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
-</div>
-</nav>
-</header>
 <!--/radix_placeholder_navigation_before_body-->
 <!--radix_placeholder_site_before_body-->
 <!--/radix_placeholder_site_before_body-->
-<!--radix_placeholder_article_listing-->
-
-<style type="text/css">
-
-/* Styles for listing layout (hide title) */
-.layout-listing d-title, .layout-listing .d-title {
-  display: none;
-}
-
-/* Styles for posts lists (not auto-injected) */
-
-
-.posts-with-sidebar {
-  padding-left: 45px;
-  padding-right: 45px;
-}
-
-.posts-list .description h2,
-.posts-list .description p {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
-}
-
-.posts-list .description h2 {
-  font-weight: 700;
-  border-bottom: none;
-  padding-bottom: 0;
-}
-
-.posts-list h2.post-tag {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
-  padding-bottom: 12px;
-}
-.posts-list {
-  margin-top: 60px;
-  margin-bottom: 24px;
-}
-
-.posts-list .post-preview {
-  text-decoration: none;
-  overflow: hidden;
-  display: block;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 24px 0;
-}
-
-.post-preview-last {
-  border-bottom: none !important;
-}
-
-.posts-list .posts-list-caption {
-  grid-column: screen;
-  font-weight: 400;
-}
-
-.posts-list .post-preview h2 {
-  margin: 0 0 6px 0;
-  line-height: 1.2em;
-  font-style: normal;
-  font-size: 24px;
-}
-
-.posts-list .post-preview p {
-  margin: 0 0 12px 0;
-  line-height: 1.4em;
-  font-size: 16px;
-}
-
-.posts-list .post-preview .thumbnail {
-  box-sizing: border-box;
-  margin-bottom: 24px;
-  position: relative;
-  max-width: 500px;
-}
-.posts-list .post-preview img {
-  width: 100%;
-  display: block;
-}
-
-.posts-list .metadata {
-  font-size: 12px;
-  line-height: 1.4em;
-  margin-bottom: 18px;
-}
-
-.posts-list .metadata > * {
-  display: inline-block;
-}
-
-.posts-list .metadata .publishedDate {
-  margin-right: 1em;
-}
-
-.posts-list .metadata .tags {
-  margin-top: 1em;
-}
-
-.posts-list .tags .tag {
-  color: rgba(0,0,0,0.67);
-  padding: 0.3em 0.5em;
-  margin: 0;
-  font-size: 80%;
-  border: 1px solid rgba(0,0,0,0.4);
-  border-radius: 3px;
-  text-transform: uppercase;
-  font-weight: 500;
-}
-
-.posts-list img {
-  opacity: 1;
-}
-
-.posts-list img[data-src] {
-  opacity: 0;
-}
-
-.posts-more {
-  clear: both;
-}
-
-
-.posts-sidebar {
-  font-size: 16px;
-}
-
-.posts-sidebar h3 {
-  font-size: 16px;
-  margin-top: 0;
-  margin-bottom: 0.5em;
-  font-weight: 400;
-  text-transform: uppercase;
-}
-
-.sidebar-section {
-  margin-bottom: 30px;
-}
-
-.categories ul {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-
-.categories li {
-  color: rgba(0, 0, 0, 0.8);
-  margin-bottom: 0;
-}
-
-.categories li>a {
-  border-bottom: none;
-}
-
-.categories li>a:hover {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-}
-
-.categories .active {
-  font-weight: 600;
-}
-
-.categories .category-count {
-  color: rgba(0, 0, 0, 0.4);
-}
-
-
-@media(min-width: 768px) {
-  .posts-list .post-preview h2 {
-    font-size: 26px;
-  }
-  .posts-list .post-preview .thumbnail {
-    float: right;
-    width: 35%;
-    margin-bottom: 0;
-  }
-  .posts-list .post-preview .description {
-    float: left;
-    width: 45%;
-  }
-  .posts-list .post-preview .metadata {
-    float: left;
-    width: 15%;
-    margin-top: 8px;
-  }
-  .posts-list .post-preview p {
-    margin: 0 0 12px 0;
-    line-height: 1.5em;
-    font-size: 16px;
-  }
-  .posts-with-sidebar .posts-list {
-    float: left;
-    width: 72%;
-  }
-  .posts-with-sidebar .posts-sidebar {
-    float: right;
-    width: 20%;
-    margin-top: 60px;
-    padding-top: 24px;
-    padding-bottom: 24px;
-  }
-}
-
-.downlevel .posts-list .post-preview {
-  color: inherit;
-}
-
-</style>
-
-<script type="application/javascript">
-
-function init_posts_list() {
-
-  function load_image(img) {
-    var src = $(img).attr('data-src');
-    if (src) {
-      $(img).attr('src', src);
-      $(img).load(function() {
-        img.removeAttribute('data-src');
-      });
-    }
-  }
-
-  function set_posts_visible(posts, visible) {
-    if (visible) {
-
-      // show bottom border by default
-      $(posts).removeClass('post-preview-last');
-
-      // apply limits if need be
-      var max_posts = 25;
-      var apply_limits = $('.posts-container').hasClass('posts-apply-limit');
-      if (apply_limits && posts.length > max_posts) {
-        posts = $(posts).slice(0, max_posts);
-      } else {
-        $('.posts-more a').addClass('hidden');
-      }
-
-      // apply last style
-      $(posts.slice(-1)[0]).addClass('post-preview-last');
-
-      $(posts).removeClass('hidden');
-      $(posts).find('img[data-src]').each(function(i, img) {
-        load_image(img);
-      });
-    } else {
-      $(posts).addClass('hidden');
-    }
-  }
-
-  function apply_hash_filter() {
-
-    // clear active state
-    $('.categories .active').removeClass('active');
-
-    // mark all posts invisible to start
-    set_posts_visible($('.posts-list').children('a'), false);
-
-    // if we have a hash filter
-    if (window.location.hash) {
-
-      // mark posts that match the category visible
-      var page_category = window.location.hash.replace("#", "");
-      var posts = $('.post-metadata').map(function(idx, script) {
-        var metadata = $.parseJSON($(script).html());
-        var post = null;
-        $.each(metadata.categories, function(idx, category) {
-          category = category.replace(/ /g,"_");
-          if (category == page_category) {
-            post = $(script).parent().get();
-            return false;
-          }
-        });
-        return post;
-      });
-      set_posts_visible(posts, true);
-
-      // mark the hash active
-      $('.categories li>a[href="' + window.location.hash + '"]').addClass('active');
-
-    } else {
-
-      // no hash filter, make all posts visible (subject to max display)
-      set_posts_visible($('.posts-list').children(), true);
-
-    }
-  }
-
-  // more articles
-  function apply_post_limits(apply) {
-    if (apply) {
-      $('.posts-container').addClass('posts-apply-limit');
-      $('.posts-more a').removeClass('hidden');
-    } else {
-      $('.posts-container').removeClass('posts-apply-limit');
-      $('.posts-more a').addClass('hidden');
-    }
-  }
-
-  // hash filter handling
-  apply_hash_filter();
-  $(window).on('hashchange',function() {
-    apply_post_limits(true);
-    apply_hash_filter();
-  });
-
-  // more articles link
-  $('.posts-more a').click(function(e) {
-    e.preventDefault();
-    apply_post_limits(false);
-    apply_hash_filter();
-    return false;
-  });
-
-}
-
-</script>
-
-
-
-<div class="posts-container posts-apply-limit l-page">
-<div class="posts-list">
-<h1 class="posts-list-caption"></h1>
-<a href="posts/2020-04-01-kovitinn/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">April 1, 2020</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020-04-01-kovitinn/covid_files/figure-html5/unnamed-chunk-3-1.png"/>
-</div>
-<div class="description">
-<h2>Kóvitinn</h2>
-<p>Have been exploring the covid data a bit lately (who has not) and thought writing down
-some notes. This blogs takes you through downloading, tidying and exploring the 
-global Johns Hopkins University (JHU) data. Some of the visualization you may 
-already have seen on various media, others may be a little bit more novice. Because
-me myself I comes from a very small nation I am particularily interested in the per
-capita numerics. And because I am aware that there are a lot of people interested in the 
-covid data but are not very fluent in R I take a little bit of a step-by-step approach.
-If only so that more of us start to appreciate the power of R.</p>
-</div>
-</a>
-<a href="posts/2020-03-16-matching-nearest-date/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">March 16, 2020</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020-03-16-matching-nearest-date/matching-nearest-date_files/figure-html5/unnamed-chunk-2-1.png"/>
-</div>
-<div class="description">
-<h2>Matching nearest date</h2>
-<p>This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.</p>
-</div>
-</a>
-<a href="posts/2020-03-04-match-points-to-interval/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">March 4, 2020</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020-03-04-match-points-to-interval/match-points-to-interval_files/figure-html5/unnamed-chunk-6-1.png"/>
-</div>
-<div class="description">
-<h2>Match points to interval</h2>
-<p>We have two datasets: 1) Captains logbook data were each activity (e.g. a fish trawl haul) is a record and has variables such start and end time as well as geographical start and end coordinates. 2) Vessel location data (VMS/AIS) were each record is spatial point in time. The VMS/AIS data are relatively frequent with short time interval between records (5 to 10 minutes), while the logbook data are relatively sparse with often relatively large time intervals (i.e. fishing activity is often in units of hours). This post demonstrate how one can match the two datasets containing multiple vessels using the foverlaps function from the data.table package.</p>
-</div>
-</a>
-<a href="posts/2019-01-17-geoinside-points-in-polygons-via-sf/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Jan. 17, 2019</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png"/>
-</div>
-<div class="description">
-<h2>Geoinside: Points in polygons via sf</h2>
-<p>Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The "geoinside" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some "insiders".</p>
-</div>
-</a>
-<a href="posts/2018-12-17-jan-mayen-shelf-size/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Dec. 17, 2018</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2018-12-17-jan-mayen-shelf-size/jan-mayen-shelf-size_files/figure-html5/unnamed-chunk-11-1.png"/>
-</div>
-<div class="description">
-<h2>Jan Mayen shelf size</h2>
-<p>So, there has been some news on cod fisheries in [Jan Mayen](https://en.wikipedia.org/wiki/Jan_Mayen). In that context I became interested in knowing what was the size of the shelf area, a potential proxy for the order of magnitute of cod that this ecosystem could hold. As usual R-comes to the rescue.</p>
-</div>
-</a>
-<a href="posts/2018-02-03-on-gridding-spatial-data/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">Feb. 3, 2018</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2018-02-03-on-gridding-spatial-data/on-gridding-spatial-data_files/figure-html5/unnamed-chunk-14-1.png"/>
-</div>
-<div class="description">
-<h2>On gridding spatial data</h2>
-<p>Lets say we have some spatial observations and wanted to calculate some summary metric (count, sum, mean, variance, …) based on specified spacial gridding of the raw data.</p>
-</div>
-</a>
-</div>
-<div class="posts-more">
-<a href="#">More articles &raquo;</a>
-</div>
-</div>
-<!--/radix_placeholder_article_listing-->
 
 <div class="d-title">
-<h1>index.utf8</h1>
-
+<h1>Kóvitinn</h1>
+<p>Have been exploring the covid data a bit lately (who has not) and thought writing down some notes. This blogs takes you through downloading, tidying and exploring the global Johns Hopkins University (JHU) data. Some of the visualization you may already have seen on various media, others may be a little bit more novice. Because me myself I comes from a very small nation I am particularily interested in the per capita numerics. And because I am aware that there are a lot of people interested in the covid data but are not very fluent in R I take a little bit of a step-by-step approach. If only so that more of us start to appreciate the power of R.</p>
 </div>
 
+<div class="d-byline">
+  Einar Hjörleifsson <a href="https://splatter.netlify.com/posts/2020-04-01-kovitinn.html" class="uri">https://splatter.netlify.com/posts/2020-04-01-kovitinn.html</a> 
+  
+<br/>04-01-2020
+</div>
 
 <div class="d-article">
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(lubridate)
+library(tidyverse)</code></pre>
+</div>
+<p><strong>This is a prerelease version</strong></p>
+<h2 id="an-allurement">An allurement</h2>
+<p>With all the myriads of plots of the covid-19 floating around on the internet, are you interested in generating your own visualization, with a particular focus on your country or your regions. Here is an allurement:</p>
+<div class="layout-chunk" data-layout="l-body">
 
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+d &lt;- 
+  read_covid(variable = &quot;confirmed&quot;) %&gt;% 
+  covid_tidy() %&gt;% 
+  group_by(country, date) %&gt;% 
+  summarise(n = sum(n)) %&gt;% 
+  filter(date &gt;= ymd(&quot;2020-02-25&quot;),
+         n &gt; 0)
+d %&gt;% 
+  ggplot() +
+  theme_minimal() +
+  geom_line(aes(date, n, group = country),
+            colour = &quot;grey&quot;) +
+  geom_line(data = d %&gt;% 
+              filter(country %in% c(&quot;Italy&quot;, &quot;United States&quot;,
+                                    &quot;Spain&quot;, &quot;South Korea&quot;,
+                                    &quot;Iceland&quot;, &quot;Dominica&quot;,
+                                    &quot;Egypt&quot;, &quot;Ecuador&quot;, &quot;South Africa&quot;)) %&gt;% 
+              rename(cc = country),
+            aes(date, n),
+            colour = &quot;red&quot;) +
+  facet_wrap(~ cc) +
+  scale_y_log10(breaks = c(10, 100, 500, 3000, 20000)) +
+  labs(x = NULL, y = NULL,
+       title = &quot;Cumulative number of confirmed cases&quot;)</code></pre>
+<p><img src="covid_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
+</div>
+<h2 id="the-data">The data</h2>
+<p>The main datasource is the <a href="https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html">Global Cases by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University (JHU)</a>. The source data for the visual app is available on <a href="https://github.com/CSSEGISandData/COVID-19">github</a>. The <a href="https://github.com/CSSEGISandData/COVID-19">global data</a><a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a> are in the directory “COVID-19/csse_covid_19_data/csse_covid_19_time_series”, containing three different csv-files containing records of:</p>
+<ul>
+<li>Confirmed cases</li>
+<li>Deaths</li>
+<li>Recovered</li>
+</ul>
+<h2 id="importing-and-tidying">Importing and tidying</h2>
+<p>The easiest way to import the data into R is via the ‘read::read_csv’-function which very convenintly allows one to read files directly from the internet. Since we want to read in any or all of the three files we create a function, using the ‘janitor::clean_names’-function to tidy up a bit the raw variable names:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+#&#39; Import global JHU covid time series data
+#&#39;
+#&#39; @param variable Character, any of &quot;confirmed&quot;, &quot;deaths&quot; or &quot;recovered&quot;
+#&#39;
+#&#39; @return A tibble
+#&#39; @export
+#&#39;
+read_covid &lt;- function(variable = &quot;confirmed&quot;) {
+  url &lt;-
+    paste0(&quot;https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/&quot;,
+           &quot;time_series_covid19_&quot;,
+           variable,
+           &quot;_global.csv&quot;)
+  readr::read_csv(url) %&gt;% 
+    janitor::clean_names()
+}</code></pre>
+</div>
+<p>The raw JHU data is effectively wide, each date is being a variable name. To ease the tidyverse analysis downstream we make it long. In addtion some the country(_region) valuse are in some cases not according to convention. E.g. “US” stands for “United States”, “Korea, South” for “South Korea”. In addition some of the statistics of smaller nations that still have some affiliation to their old colonial masters are under province(_state) within a country(_region). Nations that come to mind are my next door neighbours, Grænlendingar and Færeyingar. The tidy function below takes care of that, but more importantly provides an standaridized country code (iso3c) from the JHU country name using function in the {countrycode}-package. And then replaces the country name from JHU with the more conventional name (so, “Korea, South” becomes “South Korea”, etc.). Since we want to tidy any or all of the three files we create a function:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+#&#39; Tidy the covid data
+#&#39;
+#&#39; Turns the wide covid table to a long format, adds ISO country
+#&#39; code (iso3c) and replaces JHU country name with more conventional name
+#&#39;
+#&#39; @param d A tibble obtained via read_covid
+#&#39;
+#&#39; @return A tibble with the following variables:
+#&#39; @export
+#&#39;
+covid_tidy &lt;- function(d) {
+  d %&gt;% 
+    dplyr::rename(province = province_state,
+                  country = country_region) %&gt;%
+    dplyr::filter(!country %in% c(&quot;Cruise Ship&quot;, &quot;Diamond Princess&quot;)) %&gt;%
+    tidyr::pivot_longer(cols = -c(province:long), names_to = &quot;date&quot;, values_to = &quot;n&quot;) %&gt;%
+    dplyr::mutate(date = lubridate::mdy(stringr::str_sub(date, 2))) %&gt;%
+    # get some of the smaller nations:
+    dplyr::mutate(country = dplyr::case_when(country %in% c(&quot;Denmark&quot;,
+                                                            &quot;France&quot;,
+                                                            &quot;Netherlands&quot;,
+                                                            &quot;United Kingdom&quot;) &amp;
+                                               !is.na(province) &amp;
+                                               province != &quot;Channel Islands&quot; ~ province,
+                                             TRUE ~ country),
+                  province = ifelse(province == country, NA_character_, province),
+                  # think this is correct:
+                  country = ifelse(country == &quot;St Martin&quot;, &quot;Sint Maarten&quot;, country),
+                  iso3c = countrycode::countrycode(country,
+                                                   origin = &quot;country.name&quot;,
+                                                   destination = &quot;iso3c&quot;),
+                  # replace JHU country name with more conventional name
+                  country = countrycode::countrycode(iso3c,
+                                                     origin = &quot;iso3c&quot;,
+                                                     destination = &quot;country.name&quot;)) %&gt;%
+    dplyr::select(country, iso3c, province, lon = long, lat, date, n)
+}</code></pre>
+</div>
+<p>Lets put these two function into action, importing, tidying the confirmed cases and have a peek:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+library(lubridate)
+library(tidyverse)
+confirmed &lt;- 
+  read_covid(variable = &quot;confirmed&quot;) %&gt;% 
+  covid_tidy()
+confirmed %&gt;% 
+  filter(country %in% c(&quot;Denmark&quot;, &quot;Greenland&quot;, &quot;Faroe Islands&quot;, &quot;Iceland&quot;),
+         date == max(date))</code></pre>
+<pre><code>
+# A tibble: 4 x 7
+  country       iso3c province    lon   lat date           n
+  &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;     &lt;dbl&gt;
+1 Faroe Islands FRO   &lt;NA&gt;      -6.91  61.9 2020-03-26   140
+2 Greenland     GRL   &lt;NA&gt;     -42.6   71.7 2020-03-26     6
+3 Denmark       DNK   &lt;NA&gt;       9.50  56.3 2020-03-26  1877
+4 Iceland       ISL   &lt;NA&gt;     -19.0   65.0 2020-03-26   802</code></pre>
+</div>
+<p>Besides the obvious variable names the variable n stands for the number of confirmed cases by country on the date specified. It is important to keep in mind that this variable is a cumulative number of cases, <strong>not</strong> the number of confirmed cases on the date specified. We can easily verify this by:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+confirmed %&gt;% 
+  filter(country %in% c(&quot;Denmark&quot;, &quot;Greenland&quot;, &quot;Faroe Islands&quot;, &quot;Iceland&quot;),
+         date &gt;= ymd(&quot;2020-02-25&quot;),
+         n &gt; 0) %&gt;% 
+  ggplot(aes(date, n, colour = country)) +
+  geom_line(lwd = 1) +
+  scale_y_log10() +
+  scale_colour_brewer(palette = &quot;Set1&quot;) +
+  labs(x = NULL, y = NULL,
+       title = &quot;Cumulative number of confirmed cases&quot;,
+       colour = &quot;Country&quot;)</code></pre>
+<p><img src="covid_files/figure-html5/unnamed-chunk-7-1.png" width="624" /></p>
+</div>
+<p>Most of the analysis below is only bases on the confirmed data. But before proceeding lets get all the three variable, confirmed, deaths and recovered into one tidy tibble:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+d &lt;- 
+  read_covid(variable = &quot;confirmed&quot;) %&gt;%
+              covid_tidy() %&gt;% 
+              rename(confirmed = n) %&gt;% 
+  left_join(read_covid(variable = &quot;deaths&quot;) %&gt;%
+              covid_tidy() %&gt;% 
+              rename(deaths = n)) %&gt;% 
+  left_join(read_covid(variable = &quot;recovered&quot;) %&gt;%
+              covid_tidy() %&gt;% 
+              rename(recovered = n))</code></pre>
+</div>
+<p>Before we proceed, lets look at the province variable:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+d %&gt;% 
+  filter(!is.na(province),
+         date == max(date)) %&gt;% 
+  count(date, country ,province)</code></pre>
+<pre><code>
+# A tibble: 57 x 4
+   date       country   province                         n
+   &lt;date&gt;     &lt;chr&gt;     &lt;chr&gt;                        &lt;int&gt;
+ 1 2020-03-26 Australia Australian Capital Territory     1
+ 2 2020-03-26 Australia New South Wales                  1
+ 3 2020-03-26 Australia Northern Territory               1
+ 4 2020-03-26 Australia Queensland                       1
+ 5 2020-03-26 Australia South Australia                  1
+ 6 2020-03-26 Australia Tasmania                         1
+ 7 2020-03-26 Australia Victoria                         1
+ 8 2020-03-26 Australia Western Australia                1
+ 9 2020-03-26 Canada    Alberta                          1
+10 2020-03-26 Canada    British Columbia                 1
+# … with 47 more rows</code></pre>
+</div>
+<p>We see here that for some countries we have more than one record per date (here checked for the last date in the dataset). The countries are:</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+d %&gt;% filter(!is.na(province)) %&gt;% pull(country) %&gt;% unique() %&gt;% sort()</code></pre>
+<pre><code>
+[1] &quot;Australia&quot;      &quot;Canada&quot;         &quot;China&quot;         
+[4] &quot;United Kingdom&quot;</code></pre>
+</div>
+<p>Now if your are interested in the exploring the statistics by province within those countries I leave you on your own. Here we will focus on nations, so we need to summarise the daily statistic (here we loose the geographical positions):</p>
+<div class="layout-chunk" data-layout="l-body">
+<pre class="r"><code>
+d &lt;- 
+  d %&gt;% 
+  group_by(country, iso3c, date) %&gt;% 
+  summarise(confirmed = sum(confirmed),
+            deaths = sum(deaths),
+            recovered = sum(recovered)) %&gt;% 
+  ungroup()</code></pre>
+</div>
+<h2 id="some-popular-.">Some popular ….</h2>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<section class="footnotes">
+<hr />
+<ol>
+<li id="fn1"><p>If you are interested in the detailed US data …<a href="#fnref1" class="footnote-back">↩</a></p></li>
+</ol>
+</section>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>

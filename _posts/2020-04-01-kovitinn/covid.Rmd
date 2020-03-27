@@ -1,0 +1,258 @@
+---
+title: "Kóvitinn"
+description: |
+  Have been exploring the covid data a bit lately (who has not) and thought writing down
+  some notes. This blogs takes you through downloading, tidying and exploring the 
+  global Johns Hopkins University (JHU) data. Some of the visualization you may 
+  already have seen on various media, others may be a little bit more novice. Because
+  me myself I comes from a very small nation I am particularily interested in the per
+  capita numerics. And because I am aware that there are a lot of people interested in the 
+  covid data but are not very fluent in R I take a little bit of a step-by-step approach.
+  If only so that more of us start to appreciate the power of R.
+
+author:
+  - name: Einar Hjörleifsson
+    url: https://splatter.netlify.com/posts/2020-04-01-kovitinn.html
+date: 04-01-2020
+output:
+  distill::distill_article:
+    self_contained: false
+draft: false
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(lubridate)
+library(tidyverse)
+```
+
+**This is a prerelease version**
+
+## An allurement
+
+With all the myriads of plots of the covid-19 floating around on the internet, are you interested in generating your own visualization, with a particular focus on your country or your regions. Here is an allurement:
+
+```{r, echo = FALSE}
+read_covid <- function(variable = "confirmed") {
+  url <-
+    paste0("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/",
+           "time_series_covid19_",
+           variable,
+           "_global.csv")
+  readr::read_csv(url) %>% 
+    janitor::clean_names()
+}
+covid_tidy <- function(d) {
+  d %>% 
+    dplyr::rename(province = province_state,
+                  country = country_region) %>%
+    dplyr::filter(!country %in% c("Cruise Ship", "Diamond Princess")) %>%
+    tidyr::pivot_longer(cols = -c(province:long), names_to = "date", values_to = "n") %>%
+    dplyr::mutate(date = lubridate::mdy(stringr::str_sub(date, 2))) %>%
+    # get some of the smaller nations:
+    dplyr::mutate(country = dplyr::case_when(country %in% c("Denmark",
+                                                            "France",
+                                                            "Netherlands",
+                                                            "United Kingdom") &
+                                               !is.na(province) &
+                                               province != "Channel Islands" ~ province,
+                                             TRUE ~ country),
+                  province = ifelse(province == country, NA_character_, province),
+                  # think this is correct:
+                  country = ifelse(country == "St Martin", "Sint Maarten", country),
+                  iso3c = countrycode::countrycode(country,
+                                                   origin = "country.name",
+                                                   destination = "iso3c"),
+                  # replace JHU country name with more conventional name
+                  country = countrycode::countrycode(iso3c,
+                                                     origin = "iso3c",
+                                                     destination = "country.name")) %>%
+    dplyr::select(country, iso3c, province, lon = long, lat, date, n)
+}
+```
+
+
+
+```{r}
+d <- 
+  read_covid(variable = "confirmed") %>% 
+  covid_tidy() %>% 
+  group_by(country, date) %>% 
+  summarise(n = sum(n)) %>% 
+  filter(date >= ymd("2020-02-25"),
+         n > 0)
+d %>% 
+  ggplot() +
+  theme_minimal() +
+  geom_line(aes(date, n, group = country),
+            colour = "grey") +
+  geom_line(data = d %>% 
+              filter(country %in% c("Italy", "United States",
+                                    "Spain", "South Korea",
+                                    "Iceland", "Dominica",
+                                    "Egypt", "Ecuador", "South Africa")) %>% 
+              rename(cc = country),
+            aes(date, n),
+            colour = "red") +
+  facet_wrap(~ cc) +
+  scale_y_log10(breaks = c(10, 100, 500, 3000, 20000)) +
+  labs(x = NULL, y = NULL,
+       title = "Cumulative number of confirmed cases")
+```
+
+
+## The data
+
+The main datasource is the  [Global Cases by the Center for Systems Science and Engineering (CSSE) at Johns Hopkins University (JHU)](https://gisanddata.maps.arcgis.com/apps/opsdashboard/index.html). The source data for the visual app is available on [github](https://github.com/CSSEGISandData/COVID-19). The [global data](https://github.com/CSSEGISandData/COVID-19)^[If you are interested in the detailed US data ...] are in the directory "COVID-19/csse_covid_19_data/csse_covid_19_time_series", containing three different csv-files containing records of:
+
+* Confirmed cases
+* Deaths
+* Recovered
+
+## Importing and tidying
+
+The easiest way to import the data into R is via the 'read::read_csv'-function which very convenintly allows one to read files directly from the internet. Since we want to read in any or all of the three files we create a function, using the 'janitor::clean_names'-function to tidy up a bit the raw variable names:
+
+```{r}
+#' Import global JHU covid time series data
+#'
+#' @param variable Character, any of "confirmed", "deaths" or "recovered"
+#'
+#' @return A tibble
+#' @export
+#'
+read_covid <- function(variable = "confirmed") {
+  url <-
+    paste0("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/",
+           "time_series_covid19_",
+           variable,
+           "_global.csv")
+  readr::read_csv(url) %>% 
+    janitor::clean_names()
+}
+```
+
+The raw JHU data is effectively wide, each date is being a variable name. To ease the tidyverse analysis downstream we make it long. In addtion some the country(_region) valuse are in some cases not according to convention. E.g. "US" stands for "United States", "Korea, South" for "South Korea". In addition some of the statistics of smaller nations that still have some affiliation to their old colonial masters are under province(_state) within a country(_region). Nations that come to mind are my next door neighbours, Grænlendingar and Færeyingar. The tidy function below takes care of that, but more importantly provides an standaridized country code (iso3c) from the JHU country name using function in the {countrycode}-package. And then replaces the country name from JHU with the more conventional name (so, "Korea, South" becomes "South Korea", etc.). Since we want to tidy any or all of the three files we create a function:
+
+```{r}
+#' Tidy the covid data
+#'
+#' Turns the wide covid table to a long format, adds ISO country
+#' code (iso3c) and replaces JHU country name with more conventional name
+#'
+#' @param d A tibble obtained via read_covid
+#'
+#' @return A tibble with the following variables:
+#' @export
+#'
+covid_tidy <- function(d) {
+  d %>% 
+    dplyr::rename(province = province_state,
+                  country = country_region) %>%
+    dplyr::filter(!country %in% c("Cruise Ship", "Diamond Princess")) %>%
+    tidyr::pivot_longer(cols = -c(province:long), names_to = "date", values_to = "n") %>%
+    dplyr::mutate(date = lubridate::mdy(stringr::str_sub(date, 2))) %>%
+    # get some of the smaller nations:
+    dplyr::mutate(country = dplyr::case_when(country %in% c("Denmark",
+                                                            "France",
+                                                            "Netherlands",
+                                                            "United Kingdom") &
+                                               !is.na(province) &
+                                               province != "Channel Islands" ~ province,
+                                             TRUE ~ country),
+                  province = ifelse(province == country, NA_character_, province),
+                  # think this is correct:
+                  country = ifelse(country == "St Martin", "Sint Maarten", country),
+                  iso3c = countrycode::countrycode(country,
+                                                   origin = "country.name",
+                                                   destination = "iso3c"),
+                  # replace JHU country name with more conventional name
+                  country = countrycode::countrycode(iso3c,
+                                                     origin = "iso3c",
+                                                     destination = "country.name")) %>%
+    dplyr::select(country, iso3c, province, lon = long, lat, date, n)
+}
+```
+
+Lets put these two function into action, importing, tidying the confirmed cases and have a peek:
+
+```{r}
+library(lubridate)
+library(tidyverse)
+confirmed <- 
+  read_covid(variable = "confirmed") %>% 
+  covid_tidy()
+confirmed %>% 
+  filter(country %in% c("Denmark", "Greenland", "Faroe Islands", "Iceland"),
+         date == max(date))
+```
+
+Besides the obvious variable names the variable n stands for the number of confirmed cases by country on the date specified. It is important to keep in mind that this variable is a cumulative number of cases, **not** the number of confirmed cases on the date specified. We can easily verify this by:
+
+```{r, fig.height = 3}
+confirmed %>% 
+  filter(country %in% c("Denmark", "Greenland", "Faroe Islands", "Iceland"),
+         date >= ymd("2020-02-25"),
+         n > 0) %>% 
+  ggplot(aes(date, n, colour = country)) +
+  geom_line(lwd = 1) +
+  scale_y_log10() +
+  scale_colour_brewer(palette = "Set1") +
+  labs(x = NULL, y = NULL,
+       title = "Cumulative number of confirmed cases",
+       colour = "Country")
+```
+
+Most of the analysis below is only bases on the confirmed data. But before proceeding lets get all the three variable, confirmed, deaths and recovered into one tidy tibble:
+
+```{r}
+d <- 
+  read_covid(variable = "confirmed") %>%
+              covid_tidy() %>% 
+              rename(confirmed = n) %>% 
+  left_join(read_covid(variable = "deaths") %>%
+              covid_tidy() %>% 
+              rename(deaths = n)) %>% 
+  left_join(read_covid(variable = "recovered") %>%
+              covid_tidy() %>% 
+              rename(recovered = n))
+```
+
+Before we proceed, lets look at the province variable:
+
+```{r}
+d %>% 
+  filter(!is.na(province),
+         date == max(date)) %>% 
+  count(date, country ,province)
+```
+
+We see here that for some countries we have more than one record per date (here checked for the last date in the dataset). The countries are:
+
+```{r}
+d %>% filter(!is.na(province)) %>% pull(country) %>% unique() %>% sort()
+```
+
+Now if your are interested in the exploring the statistics by province within those countries I leave you on your own. Here we will focus on nations, so we need to summarise the daily statistic (here we loose the geographical positions):
+
+```{r}
+d <- 
+  d %>% 
+  group_by(country, iso3c, date) %>% 
+  summarise(confirmed = sum(confirmed),
+            deaths = sum(deaths),
+            recovered = sum(recovered)) %>% 
+  ungroup()
+```
+
+## Some popular ....
+
+```{r}
+
+```
+
