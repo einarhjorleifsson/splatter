@@ -7,23 +7,7 @@
     <description>Some spur of the moment notes, mostly related to R
 </description>
     <generator>Distill</generator>
-    <lastBuildDate>mið, 01 apr 2020 00:00:00 +0000</lastBuildDate>
-    <item>
-      <title>Kóvitinn</title>
-      <dc:creator>Einar Hjörleifsson</dc:creator>
-      <link>https://splatter.netlify.com/posts/2020-04-01-kovitinn</link>
-      <description>Have been exploring the covid data a bit lately (who has not) and thought writing down
-some notes. This blogs takes you through downloading, tidying and exploring the 
-global Johns Hopkins University (JHU) data. Some of the visualization you may 
-already have seen on various media, others may be a little bit more novice. Because
-me myself I comes from a very small nation I am particularily interested in the per
-capita numerics. And because I am aware that there are a lot of people interested in the 
-covid data but are not very fluent in R I take a little bit of a step-by-step approach.
-If only so that more of us start to appreciate the power of R.</description>
-      <guid>https://splatter.netlify.com/posts/2020-04-01-kovitinn</guid>
-      <pubDate>mið, 01 apr 2020 00:00:00 +0000</pubDate>
-      <media:content url="https://splatter.netlify.com/posts/2020-04-01-kovitinn/covid_files/figure-html5/unnamed-chunk-3-1.png" medium="image" type="image/png" width="1248" height="768"/>
-    </item>
+    <lastBuildDate>mán, 16 mar 2020 00:00:00 +0000</lastBuildDate>
     <item>
       <title>Matching nearest date</title>
       <dc:creator>Einar Hjörleifsson</dc:creator>
