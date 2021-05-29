@@ -1,0 +1,118 @@
+---
+title: "PostgreSQL/PostGIS installation and then some"
+description: |
+  Again this blogpost is mostly a note to oneself. On installing PostgreSQL and its extention PostGIS on Fedora. And then loading and retrieving some spatial data via R.
+author:
+  - name: Einar Hjörleifsson
+    url: https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date.html
+date: 05-29-2021
+output:
+  distill::distill_article:
+    self_contained: false
+draft: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+Since I had earlier installed postgres the first step, in order to ensure reproducability I delete the earlier installation (this is of course done in a terminal window):
+
+```
+sudo yum remove postgres\*
+sudo rm -rf /var/lib/pgsql
+```
+
+The installation is then done by:
+
+```
+sudo dnf install postgis postgresql-server postgresql
+sudo postgresql-setup --initdb
+sudo systemctl start postgresql
+```
+
+Once things are installed one is ready for setting things up, like creating user name and database:
+
+```
+sudo su - postgres
+createuser einar
+createdb test_db -O einar
+```
+
+Next step was to grant privileges for the user:
+
+```
+psql -d test_db -c "grant all privileges on database test_db to einar;"
+```
+
+The above should be sufficient if one is only working with non-spatial data. But to include the PostGIS one needs to add that extention. This has to be done for each database that one generates:
+
+```
+psql -d test_db -c "CREATE EXTENSION postgis;"
+psql -d test_db -c "CREATE EXTENSION postgis_topology;"
+```
+
+Once in place we are now ready to switch to R. Here we first obtain some spatial data:
+
+```{r}
+library(tidyverse)
+library(sf)
+bc <- 
+  read_sf("ftp://ftp.hafro.is/pub/data/shapes/bormicon.gpkg")
+```
+
+The data has a geometry that are polygons:
+
+```{r}
+bc %>% glimpse()
+```
+
+Visually we have:
+
+```{r}
+bc %>% 
+  ggplot() + 
+  geom_sf(aes(fill = name)) +
+  theme(legend.position = "none")
+```
+
+We are now ready to load the data into the database. We first need to setup the connetion and then we will simply use `st_write` to upload the data to the database:
+
+```{r}
+library(RPostgreSQL)
+con <- dbConnect(drv = "PostgreSQL", dbname = "test_db")
+bc %>% 
+  st_write(dsn = con, layer = "bormicon")
+rm(bc)  # nothing up my sleave
+```
+
+Now we could try to retrieve that data via a usual `tbl`-function:
+
+```{r}
+bc <- tbl(con, "bormicon")
+bc %>% glimpse()
+```
+
+Here we get a warning message and the geometry looks very unfamiliar (is in binary format). It is still of the class expected and one can take a peek at the sql-query:
+
+```{r}
+bc %>% class()
+bc %>% show_query()
+```
+
+Now one could do the usual database acrobatics via {dbplyr} on this but only in the non-spatial form. To get the proper spatial format one simply uses the `st_read`-function:
+
+```{r}
+rm(bc)  # nothing up my sleave
+bc <- st_read(con, layer = "bormicon")
+bc %>% class()
+```
+
+The class here is however a spatial tibble that is fully loaded into R. I.e. we can not send any spatial sf-verbs to the database. There are ways to generate spatial queries to the database via sql-construction but there is as of yet no spatial backend that translates sf-function to sql. But that could be coming soon, check out e.g. [Database interoperability for spatial objects in R](https://etiennebr.github.io/spatial-database-proposal/out/isc-proposal.html).
+
+```{r}
+DBI::dbDisconnect(con)
+```
+
+

@@ -7,14 +7,23 @@
     <description>Some spur of the moment notes, mostly related to R
 </description>
     <generator>Distill</generator>
-    <lastBuildDate>mán, 16 mar 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 29 May 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>PostgreSQL/PostGIS installation and then some</title>
+      <dc:creator>Einar Hjörleifsson</dc:creator>
+      <link>https://splatter.netlify.com/posts/2021-05-29-postgresqlpostgis-installation-and-then-some</link>
+      <description>Again this blogpost is mostly a note to oneself. On installing PostgreSQL and its extention PostGIS on Fedora. And then loading and retrieving some spatial data via R.</description>
+      <guid>https://splatter.netlify.com/posts/2021-05-29-postgresqlpostgis-installation-and-then-some</guid>
+      <pubDate>Sat, 29 May 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://splatter.netlify.com/posts/2021-05-29-postgresqlpostgis-installation-and-then-some/postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-3-1.png" medium="image" type="image/png" width="1248" height="768"/>
+    </item>
     <item>
       <title>Matching nearest date</title>
       <dc:creator>Einar Hjörleifsson</dc:creator>
       <link>https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date</link>
       <description>This blogpost is mostly a note to oneself. Some datasets we want to merge or join may not have a variable that matches perfectly. A case in point is if one were to join the logbook and landings dataset by landing date, where the dates can in few cases lag by some two or three days. As of the time this is written there is no available solution in the tidyverse, i.e. a simple join will not work. Hence one needs to move out of that confort zone and dive into the data.table world. Must say the latter is impressive and I have been st(r)aying there more and more.</description>
       <guid>https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date</guid>
-      <pubDate>mán, 16 mar 2020 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 16 Mar 2020 00:00:00 +0000</pubDate>
       <media:content url="https://splatter.netlify.com/posts/2020-03-16-matching-nearest-date/matching-nearest-date_files/figure-html5/unnamed-chunk-2-1.png" medium="image" type="image/png" width="1248" height="768"/>
     </item>
     <item>
@@ -23,7 +32,7 @@
       <link>https://splatter.netlify.com/posts/2020-03-04-match-points-to-interval</link>
       <description>We have two datasets: 1) Captains logbook data were each activity (e.g. a fish trawl haul) is a record and has variables such start and end time as well as geographical start and end coordinates. 2) Vessel location data (VMS/AIS) were each record is spatial point in time. The VMS/AIS data are relatively frequent with short time interval between records (5 to 10 minutes), while the logbook data are relatively sparse with often relatively large time intervals (i.e. fishing activity is often in units of hours). This post demonstrate how one can match the two datasets containing multiple vessels using the foverlaps function from the data.table package.</description>
       <guid>https://splatter.netlify.com/posts/2020-03-04-match-points-to-interval</guid>
-      <pubDate>mið, 04 mar 2020 00:00:00 +0000</pubDate>
+      <pubDate>Wed, 04 Mar 2020 00:00:00 +0000</pubDate>
       <media:content url="https://splatter.netlify.com/posts/2020-03-04-match-points-to-interval/match-points-to-interval_files/figure-html5/unnamed-chunk-6-1.png" medium="image" type="image/png" width="1248" height="768"/>
     </item>
     <item>
@@ -32,7 +41,7 @@
       <link>https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf</link>
       <description>Lets say we have some spatial areas (polygons) and then some spatial data points. And we are interested to find the area that each point falls into. An example could be finding the ICES statistical rectangles that a set of fishing operations fall under. This problem has been solved many times, this post is only a memo to oneself how this is done using functions in the sf-package using the tidyverse approach. The "geoinside" in the title is a reference to a function in the geo-packages, where such a solution has been available for over two decades, at least to some "insiders".</description>
       <guid>https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf</guid>
-      <pubDate>fim, 17 jan 2019 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 17 Jan 2019 00:00:00 +0000</pubDate>
       <media:content url="https://splatter.netlify.com/posts/2019-01-17-geoinside-points-in-polygons-via-sf/geoinside-points-in-polygons-via-sf_files/figure-html5/unnamed-chunk-2-1.png" medium="image" type="image/png" width="1248" height="768"/>
     </item>
     <item>
@@ -41,7 +50,7 @@
       <link>https://splatter.netlify.com/posts/2018-12-17-jan-mayen-shelf-size</link>
       <description>So, there has been some news on cod fisheries in [Jan Mayen](https://en.wikipedia.org/wiki/Jan_Mayen). In that context I became interested in knowing what was the size of the shelf area, a potential proxy for the order of magnitute of cod that this ecosystem could hold. As usual R-comes to the rescue.</description>
       <guid>https://splatter.netlify.com/posts/2018-12-17-jan-mayen-shelf-size</guid>
-      <pubDate>mán, 17 des 2018 00:00:00 +0000</pubDate>
+      <pubDate>Mon, 17 Dec 2018 00:00:00 +0000</pubDate>
       <media:content url="https://splatter.netlify.com/posts/2018-12-17-jan-mayen-shelf-size/jan-mayen-shelf-size_files/figure-html5/unnamed-chunk-11-1.png" medium="image" type="image/png" width="1248" height="768"/>
     </item>
     <item>
@@ -50,7 +59,7 @@
       <link>https://splatter.netlify.com/posts/2018-02-03-on-gridding-spatial-data</link>
       <description>Lets say we have some spatial observations and wanted to calculate some summary metric (count, sum, mean, variance, …) based on specified spacial gridding of the raw data.</description>
       <guid>https://splatter.netlify.com/posts/2018-02-03-on-gridding-spatial-data</guid>
-      <pubDate>lau, 03 feb 2018 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 03 Feb 2018 00:00:00 +0000</pubDate>
       <media:content url="https://splatter.netlify.com/posts/2018-02-03-on-gridding-spatial-data/on-gridding-spatial-data_files/figure-html5/unnamed-chunk-14-1.png" medium="image" type="image/png" width="1248" height="768"/>
     </item>
   </channel>
