@@ -131,7 +131,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-3-1.png"]}
+  {"type":"character","attributes":{},"value":["postgresqlpostgis-installation-and-then-some_files/anchor-4.2.2/anchor.min.js","postgresqlpostgis-installation-and-then-some_files/bowser-1.9.3/bowser.min.js","postgresqlpostgis-installation-and-then-some_files/distill-2.2.21/template.v2.js","postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-3-1.png","postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-8-1.png","postgresqlpostgis-installation-and-then-some_files/jquery-1.11.3/jquery.min.js","postgresqlpostgis-installation-and-then-some_files/popper-2.6.0/popper.min.js","postgresqlpostgis-installation-and-then-some_files/tippy-6.2.7/tippy-bundle.umd.min.js","postgresqlpostgis-installation-and-then-some_files/tippy-6.2.7/tippy-light-border.css","postgresqlpostgis-installation-and-then-some_files/tippy-6.2.7/tippy.css","postgresqlpostgis-installation-and-then-some_files/tippy-6.2.7/tippy.umd.min.js","postgresqlpostgis-installation-and-then-some_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -2223,6 +2223,21 @@ FROM &quot;bormicon&quot;</code></pre>
 <pre><code>[1] &quot;sf&quot;         &quot;data.frame&quot;</code></pre>
 </div>
 <p>The class here is however a spatial tibble that is fully loaded into R. I.e. we can not send any spatial sf-verbs to the database. There are ways to generate spatial queries to the database via sql-construction but there is as of yet no spatial backend that translates sf-function to sql. But that could be coming soon, check out e.g. <a href="https://etiennebr.github.io/spatial-database-proposal/out/isc-proposal.html">Database interoperability for spatial objects in R</a>.</p>
+<p>In the meantime one has to do something like this (here merge all the polygons):</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>q</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span>
+  <span class='st'>'SELECT ST_Union(geom) AS "geom"'</span>,
+  <span class='st'>'FROM "bormicon";'</span>
+<span class='op'>)</span>
+<span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>st_read</a></span><span class='op'>(</span><span class='va'>con</span>, query <span class='op'>=</span> <span class='va'>q</span>, quiet <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'>ggplot</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'>theme_void</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>geom_sf</span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"grey"</span>, colour <span class='op'>=</span> <span class='st'>"grey"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
+</div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>DBI</span><span class='fu'>::</span><span class='fu'><a href='https://dbi.r-dbi.org/reference/dbDisconnect.html'>dbDisconnect</a></span><span class='op'>(</span><span class='va'>con</span><span class='op'>)</span>

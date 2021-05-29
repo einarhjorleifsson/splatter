@@ -111,8 +111,19 @@ bc %>% class()
 
 The class here is however a spatial tibble that is fully loaded into R. I.e. we can not send any spatial sf-verbs to the database. There are ways to generate spatial queries to the database via sql-construction but there is as of yet no spatial backend that translates sf-function to sql. But that could be coming soon, check out e.g. [Database interoperability for spatial objects in R](https://etiennebr.github.io/spatial-database-proposal/out/isc-proposal.html).
 
+In the meantime one has to do something like this (here merge all the polygons):
+
+```{r}
+q <- paste(
+  'SELECT ST_Union(geom) AS "geom"',
+  'FROM "bormicon";'
+)
+st_read(con, query = q, quiet = TRUE) %>% 
+  ggplot() + 
+  theme_void() +
+  geom_sf(fill = "grey", colour = "grey")
+```
+
 ```{r}
 DBI::dbDisconnect(con)
 ```
-
-
