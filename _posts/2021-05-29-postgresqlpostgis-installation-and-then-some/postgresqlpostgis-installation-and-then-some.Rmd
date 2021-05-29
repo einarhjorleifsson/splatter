@@ -36,21 +36,21 @@ Once things are installed one is ready for setting things up, like creating user
 
 ```
 sudo su - postgres
-createuser einar
-createdb test_db -O einar
+createuser einarhj
+createdb splatter -O einarhj
 ```
 
 Next step was to grant privileges for the user:
 
 ```
-psql -d test_db -c "grant all privileges on database test_db to einar;"
+psql -d splatter -c "grant all privileges on database splatter to einarhj;"
 ```
 
 The above should be sufficient if one is only working with non-spatial data. But to include the PostGIS one needs to add that extention. This has to be done for each database that one generates:
 
 ```
-psql -d test_db -c "CREATE EXTENSION postgis;"
-psql -d test_db -c "CREATE EXTENSION postgis_topology;"
+psql -d splatter -c "CREATE EXTENSION postgis;"
+psql -d splatter -c "CREATE EXTENSION postgis_topology;"
 ```
 
 Once in place we are now ready to switch to R. Here we first obtain some spatial data:
@@ -58,70 +58,69 @@ Once in place we are now ready to switch to R. Here we first obtain some spatial
 ```{r}
 library(tidyverse)
 library(sf)
-bc <- 
-  read_sf("ftp://ftp.hafro.is/pub/data/shapes/bormicon.gpkg")
+ia <- 
+  read_sf("ftp://ftp.hafro.is/pub/data/shapes/ices_areas.gpkg")
 ```
 
-The data has a geometry that are polygons:
-
+The data has a geometry that are multipolygons:
+ 
 ```{r}
-bc %>% glimpse()
+ia %>% glimpse()
 ```
 
 Visually we have:
 
 ```{r}
-bc %>% 
-  ggplot() + 
-  geom_sf(aes(fill = name)) +
-  theme(legend.position = "none")
+ia %>% 
+  select(area_27) %>% 
+  plot()
 ```
 
-We are now ready to load the data into the database. We first need to setup the connetion and then we will simply use `st_write` to upload the data to the database:
+We are now ready to load the data into the database. We first need to setup the connection and then we will simply use `st_write` to upload the data to the database:
 
 ```{r}
 library(RPostgreSQL)
-con <- dbConnect(drv = "PostgreSQL", dbname = "test_db")
-bc %>% 
-  st_write(dsn = con, layer = "bormicon")
-rm(bc)  # nothing up my sleave
+con <- dbConnect(drv = "PostgreSQL", dbname = "splatter") 
+ia %>% 
+  st_write(dsn = con, layer = "ices_area")
+rm(ia)  # nothing up my sleave
 ```
 
 Now we could try to retrieve that data via a usual `tbl`-function:
 
 ```{r}
-bc <- tbl(con, "bormicon")
-bc %>% glimpse()
+ia <- tbl(con, "ices_area")
+ia %>% glimpse()
 ```
 
 Here we get a warning message and the geometry looks very unfamiliar (is in binary format). It is still of the class expected and one can take a peek at the sql-query:
 
 ```{r}
-bc %>% class()
-bc %>% show_query()
+ia %>% class()
+ia %>% show_query()
 ```
 
 Now one could do the usual database acrobatics via {dbplyr} on this but only in the non-spatial form. To get the proper spatial format one simply uses the `st_read`-function:
 
 ```{r}
-rm(bc)  # nothing up my sleave
-bc <- st_read(con, layer = "bormicon")
-bc %>% class()
+rm(ia)  # nothing up my sleave
+ia <- st_read(con, layer = "ices_area")
+ia %>% class()
 ```
 
 The class here is however a spatial tibble that is fully loaded into R. I.e. we can not send any spatial sf-verbs to the database. There are ways to generate spatial queries to the database via sql-construction but there is as of yet no spatial backend that translates sf-function to sql. But that could be coming soon, check out e.g. [Database interoperability for spatial objects in R](https://etiennebr.github.io/spatial-database-proposal/out/isc-proposal.html).
 
-In the meantime one has to do something like this (here merge all the polygons):
+In the meantime one has to do something like this (here merge polygons to subarea):
 
 ```{r}
 q <- paste(
-  'SELECT ST_Union(geom) AS "geom"',
-  'FROM "bormicon";'
+  'SELECT subarea, ST_Union(geom) AS geom',
+  'FROM ices_area',
+  'GROUP BY subarea;'
 )
 st_read(con, query = q, quiet = TRUE) %>% 
-  ggplot() + 
-  theme_void() +
-  geom_sf(fill = "grey", colour = "grey")
+  mutate(subarea = str_pad(subarea, width = 2, pad = "0")) %>% 
+  plot()
 ```
 
 ```{r}

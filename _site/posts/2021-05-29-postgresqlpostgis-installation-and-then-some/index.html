@@ -2126,114 +2126,125 @@ sudo postgresql-setup --initdb
 sudo systemctl start postgresql</code></pre>
 <p>Once things are installed one is ready for setting things up, like creating user name and database:</p>
 <pre><code>sudo su - postgres
-createuser einar
-createdb test_db -O einar</code></pre>
+createuser einarhj
+createdb splatter -O einarhj</code></pre>
 <p>Next step was to grant privileges for the user:</p>
-<pre><code>psql -d test_db -c &quot;grant all privileges on database test_db to einar;&quot;</code></pre>
+<pre><code>psql -d splatter -c &quot;grant all privileges on database splatter to einarhj;&quot;</code></pre>
 <p>The above should be sufficient if one is only working with non-spatial data. But to include the PostGIS one needs to add that extention. This has to be done for each database that one generates:</p>
-<pre><code>psql -d test_db -c &quot;CREATE EXTENSION postgis;&quot;
-psql -d test_db -c &quot;CREATE EXTENSION postgis_topology;&quot;</code></pre>
+<pre><code>psql -d splatter -c &quot;CREATE EXTENSION postgis;&quot;
+psql -d splatter -c &quot;CREATE EXTENSION postgis_topology;&quot;</code></pre>
 <p>Once in place we are now ready to switch to R. Here we first obtain some spatial data:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://r-spatial.github.io/sf/'>sf</a></span><span class='op'>)</span>
-<span class='va'>bc</span> <span class='op'>&lt;-</span> 
-  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>read_sf</a></span><span class='op'>(</span><span class='st'>"ftp://ftp.hafro.is/pub/data/shapes/bormicon.gpkg"</span><span class='op'>)</span>
+<span class='va'>ia</span> <span class='op'>&lt;-</span> 
+  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>read_sf</a></span><span class='op'>(</span><span class='st'>"ftp://ftp.hafro.is/pub/data/shapes/ices_areas.gpkg"</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
-<p>The data has a geometry that are polygons:</p>
+<p>The data has a geometry that are multipolygons:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>bc</span> <span class='op'>%&gt;%</span> <span class='fu'>glimpse</span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ia</span> <span class='op'>%&gt;%</span> <span class='fu'>glimpse</span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
-<pre><code>Rows: 16
-Columns: 5
-$ nafn &lt;chr&gt; &quot;Vestur&quot;, &quot;Vestfirdir&quot;, &quot;Mid.Nordur&quot;, &quot;Grunnslod.nordur…
-$ area &lt;dbl&gt; 50436.738, 31952.912, 22803.168, 10500.918, 16024.065, …
-$ nr   &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
-$ name &lt;chr&gt; &quot;W&quot;, &quot;NW&quot;, &quot;N_center&quot;, &quot;N_shallow&quot;, &quot;NE&quot;, &quot;E&quot;, &quot;E_ridge…
-$ geom &lt;POLYGON [°]&gt; POLYGON ((-24.41668 65.5, -..., POLYGON ((-20.97307 65.…</code></pre>
+<pre><code>Rows: 66
+Columns: 11
+$ objectid_1 &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15…
+$ objectid   &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15…
+$ major_fa   &lt;chr&gt; &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;…
+$ subarea    &lt;chr&gt; &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;5&quot;, &quot;4&quot;, &quot;4&quot;, &quot;3&quot;, &quot;4&quot;,…
+$ division   &lt;chr&gt; &quot;d&quot;, &quot;d&quot;, &quot;d&quot;, &quot;b&quot;, &quot;c&quot;, &quot;a&quot;, &quot;c&quot;, &quot;b&quot;, &quot;a&quot;, &quot;a&quot;,…
+$ subdivisio &lt;chr&gt; &quot;27&quot;, &quot;25&quot;, &quot;24&quot;, &quot;23&quot;, &quot;22&quot;, &quot;2&quot;, NA, NA, &quot;20&quot;, …
+$ unit       &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ area_full  &lt;chr&gt; &quot;27.3.d.27&quot;, &quot;27.3.d.25&quot;, &quot;27.3.d.24&quot;, &quot;27.3.b.23…
+$ area_27    &lt;chr&gt; &quot;3.d.27&quot;, &quot;3.d.25&quot;, &quot;3.d.24&quot;, &quot;3.b.23&quot;, &quot;3.c.22&quot;,…
+$ area_km2   &lt;dbl&gt; 30398.142, 43707.615, 24167.589, 2280.994, 17862.…
+$ geom       &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((19 59.70349..., MULT…</code></pre>
 </div>
 <p>Visually we have:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>bc</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'>ggplot</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
-  <span class='fu'>geom_sf</span><span class='op'>(</span><span class='fu'>aes</span><span class='op'>(</span>fill <span class='op'>=</span> <span class='va'>name</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'>theme</span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ia</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'>select</span><span class='op'>(</span><span class='va'>area_27</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
 <p><img src="postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
 </div>
-<p>We are now ready to load the data into the database. We first need to setup the connetion and then we will simply use <code>st_write</code> to upload the data to the database:</p>
+<p>We are now ready to load the data into the database. We first need to setup the connection and then we will simply use <code>st_write</code> to upload the data to the database:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/tomoakin/RPostgreSQL'>RPostgreSQL</a></span><span class='op'>)</span>
-<span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'>dbConnect</span><span class='op'>(</span>drv <span class='op'>=</span> <span class='st'>"PostgreSQL"</span>, dbname <span class='op'>=</span> <span class='st'>"test_db"</span><span class='op'>)</span>
-<span class='va'>bc</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_write.html'>st_write</a></span><span class='op'>(</span>dsn <span class='op'>=</span> <span class='va'>con</span>, layer <span class='op'>=</span> <span class='st'>"bormicon"</span><span class='op'>)</span>
-<span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>bc</span><span class='op'>)</span>  <span class='co'># nothing up my sleave</span>
+<span class='va'>con</span> <span class='op'>&lt;-</span> <span class='fu'>dbConnect</span><span class='op'>(</span>drv <span class='op'>=</span> <span class='st'>"PostgreSQL"</span>, dbname <span class='op'>=</span> <span class='st'>"splatter"</span><span class='op'>)</span> 
+<span class='va'>ia</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_write.html'>st_write</a></span><span class='op'>(</span>dsn <span class='op'>=</span> <span class='va'>con</span>, layer <span class='op'>=</span> <span class='st'>"ices_area"</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>ia</span><span class='op'>)</span>  <span class='co'># nothing up my sleave</span>
 </code></pre>
 </div>
 </div>
 <p>Now we could try to retrieve that data via a usual <code>tbl</code>-function:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>bc</span> <span class='op'>&lt;-</span> <span class='fu'>tbl</span><span class='op'>(</span><span class='va'>con</span>, <span class='st'>"bormicon"</span><span class='op'>)</span>
-<span class='va'>bc</span> <span class='op'>%&gt;%</span> <span class='fu'>glimpse</span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ia</span> <span class='op'>&lt;-</span> <span class='fu'>tbl</span><span class='op'>(</span><span class='va'>con</span>, <span class='st'>"ices_area"</span><span class='op'>)</span>
+<span class='va'>ia</span> <span class='op'>%&gt;%</span> <span class='fu'>glimpse</span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>Rows: ??
-Columns: 5
-Database: postgres 12.0.6 [@/var/run/postgresql:5432/test_db]
-$ nafn &lt;chr&gt; &quot;Vestur&quot;, &quot;Vestfirdir&quot;, &quot;Mid.Nordur&quot;, &quot;Grunnslod.nordur…
-$ area &lt;dbl&gt; 50436.738, 31952.912, 22803.168, 10500.918, 16024.065, …
-$ nr   &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16
-$ name &lt;chr&gt; &quot;W&quot;, &quot;NW&quot;, &quot;N_center&quot;, &quot;N_shallow&quot;, &quot;NE&quot;, &quot;E&quot;, &quot;E_ridge…
-$ geom &lt;chr&gt; &quot;0103000020E610000001000000C5040000182143B4AB6A38C03ED0…</code></pre>
+Columns: 11
+Database: postgres 12.0.6 [@/var/run/postgresql:5432/splatter]
+$ objectid_1 &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 31, 32, 11, 12, 13…
+$ objectid   &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 31, 32, 11, 12, 13…
+$ major_fa   &lt;chr&gt; &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;27&quot;, &quot;…
+$ subarea    &lt;chr&gt; &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;3&quot;, &quot;5&quot;, &quot;4&quot;, &quot;4&quot;, &quot;3&quot;, &quot;4&quot;,…
+$ division   &lt;chr&gt; &quot;d&quot;, &quot;d&quot;, &quot;d&quot;, &quot;b&quot;, &quot;c&quot;, &quot;a&quot;, &quot;c&quot;, &quot;b&quot;, &quot;a&quot;, &quot;a&quot;,…
+$ subdivisio &lt;chr&gt; &quot;27&quot;, &quot;25&quot;, &quot;24&quot;, &quot;23&quot;, &quot;22&quot;, &quot;2&quot;, NA, NA, &quot;20&quot;, …
+$ unit       &lt;chr&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ area_full  &lt;chr&gt; &quot;27.3.d.27&quot;, &quot;27.3.d.25&quot;, &quot;27.3.d.24&quot;, &quot;27.3.b.23…
+$ area_27    &lt;chr&gt; &quot;3.d.27&quot;, &quot;3.d.25&quot;, &quot;3.d.24&quot;, &quot;3.b.23&quot;, &quot;3.c.22&quot;,…
+$ area_km2   &lt;dbl&gt; 30398.142, 43707.615, 24167.589, 2280.994, 17862.…
+$ geom       &lt;chr&gt; &quot;0106000020E6100000010000000103000000270000005202…</code></pre>
 </div>
 <p>Here we get a warning message and the geometry looks very unfamiliar (is in binary format). It is still of the class expected and one can take a peek at the sql-query:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>bc</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ia</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>[1] &quot;tbl_PostgreSQLConnection&quot; &quot;tbl_dbi&quot;                 
 [3] &quot;tbl_sql&quot;                  &quot;tbl_lazy&quot;                
 [5] &quot;tbl&quot;                     </code></pre>
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>bc</span> <span class='op'>%&gt;%</span> <span class='fu'>show_query</span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ia</span> <span class='op'>%&gt;%</span> <span class='fu'>show_query</span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>&lt;SQL&gt;
 SELECT *
-FROM &quot;bormicon&quot;</code></pre>
+FROM &quot;ices_area&quot;</code></pre>
 </div>
 <p>Now one could do the usual database acrobatics via {dbplyr} on this but only in the non-spatial form. To get the proper spatial format one simply uses the <code>st_read</code>-function:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>bc</span><span class='op'>)</span>  <span class='co'># nothing up my sleave</span>
-<span class='va'>bc</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>st_read</a></span><span class='op'>(</span><span class='va'>con</span>, layer <span class='op'>=</span> <span class='st'>"bormicon"</span><span class='op'>)</span>
-<span class='va'>bc</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/rm.html'>rm</a></span><span class='op'>(</span><span class='va'>ia</span><span class='op'>)</span>  <span class='co'># nothing up my sleave</span>
+<span class='va'>ia</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>st_read</a></span><span class='op'>(</span><span class='va'>con</span>, layer <span class='op'>=</span> <span class='st'>"ices_area"</span><span class='op'>)</span>
+<span class='va'>ia</span> <span class='op'>%&gt;%</span> <span class='fu'><a href='https://rdrr.io/r/base/class.html'>class</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
 <pre><code>[1] &quot;sf&quot;         &quot;data.frame&quot;</code></pre>
 </div>
 <p>The class here is however a spatial tibble that is fully loaded into R. I.e. we can not send any spatial sf-verbs to the database. There are ways to generate spatial queries to the database via sql-construction but there is as of yet no spatial backend that translates sf-function to sql. But that could be coming soon, check out e.g. <a href="https://etiennebr.github.io/spatial-database-proposal/out/isc-proposal.html">Database interoperability for spatial objects in R</a>.</p>
-<p>In the meantime one has to do something like this (here merge all the polygons):</p>
+<p>In the meantime one has to do something like this (here merge polygons to subarea):</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span class='va'>q</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span>
-  <span class='st'>'SELECT ST_Union(geom) AS "geom"'</span>,
-  <span class='st'>'FROM "bormicon";'</span>
+  <span class='st'>'SELECT subarea, ST_Union(geom) AS geom'</span>,
+  <span class='st'>'FROM ices_area'</span>,
+  <span class='st'>'GROUP BY subarea;'</span>
 <span class='op'>)</span>
 <span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_read.html'>st_read</a></span><span class='op'>(</span><span class='va'>con</span>, query <span class='op'>=</span> <span class='va'>q</span>, quiet <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'>ggplot</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
-  <span class='fu'>theme_void</span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'>geom_sf</span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"grey"</span>, colour <span class='op'>=</span> <span class='st'>"grey"</span><span class='op'>)</span>
+  <span class='fu'>mutate</span><span class='op'>(</span>subarea <span class='op'>=</span> <span class='fu'>str_pad</span><span class='op'>(</span><span class='va'>subarea</span>, width <span class='op'>=</span> <span class='fl'>2</span>, pad <span class='op'>=</span> <span class='st'>"0"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://r-spatial.github.io/sf/reference/plot.html'>plot</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
 <p><img src="postgresqlpostgis-installation-and-then-some_files/figure-html5/unnamed-chunk-8-1.png" width="624" /></p>
