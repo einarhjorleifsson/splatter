@@ -1,0 +1,15 @@
+---
+title: "Me, myself, I, ..."
+about:
+  template: jolla
+  links:
+    - icon: github
+      text: Github
+      href: https://github.com/einarhjorleifsson/splatter
+
+---
+
+![lalina](../lalina.png){width=800}
+This site focuses on fisheries science and coding
+
+My background is fisheries science. Have dabbled in fish stock assessment, HCR evaluation and advice for a while. Now trying to wind down, latest fling though is spatial fisheries footprint.

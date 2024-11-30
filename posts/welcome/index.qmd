@@ -1,0 +1,8 @@
+---
+title: "Blog reinstigation"
+date: "2024-11-27"
+categories: [news]
+---
+
+This is the first Quarto blog post. Welcome!
+
