@@ -1,4 +1,4 @@
 - source: project
   netlify:
-    - id: 90af7647-10ff-4097-846b-73676b2fca29
+    - id: '90af7647-10ff-4097-846b-73676b2fca29'
       url: 'https://splatter.netlify.app'
