@@ -1,0 +1,4 @@
+- source: project
+  netlify:
+    - id: 47990881-c5cd-4e53-a04f-09f82ddb65fd
+      url: 'https://splatter.netlify.app'
